@@ -16,9 +16,9 @@ const PerformancePlot = ({ fund, position, color }: PerformancePlotProps) => {
   
   // Generate points based on performance data
   const points = [
-    new Vector3(-2, fund.returns.oneYear * 5, 0),
-    new Vector3(0, fund.returns.threeYear * 3, 0),
-    new Vector3(2, fund.returns.fiveYear * 2, 0),
+    new Vector3(-2, fund.returns["1Y"] * 5, 0),
+    new Vector3(0, fund.returns["3Y"] * 3, 0),
+    new Vector3(2, fund.returns["5Y"] * 2, 0),
   ];
 
   useFrame(() => {
@@ -52,7 +52,7 @@ const PerformancePlot = ({ fund, position, color }: PerformancePlotProps) => {
         anchorX="center"
         anchorY="middle"
       >
-        {fund.name}
+        {fund.scheme_name}
       </Text>
       
       {/* Ring representing AUM */}
