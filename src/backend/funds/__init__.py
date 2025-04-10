@@ -1,0 +1,2 @@
+
+# Funds app initialization

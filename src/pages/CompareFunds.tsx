@@ -10,9 +10,8 @@ import { ComparisonTable } from "@/components/comparison-table";
 import { ComparisonChart } from "@/components/comparison-chart";
 import { FundPerformance3D } from "@/components/visualizations/FundPerformance3D";
 import { FundData } from "@/lib/types";
-
-// Import mock data with the correct name
-import { mockFunds } from "@/lib/mock-data";
+import { fetchFunds } from "@/lib/api";
+import { toast } from "@/components/ui/use-toast";
 
 export default function CompareFunds() {
   const [selectedFunds, setSelectedFunds] = useState<FundData[]>([]);
@@ -21,15 +20,27 @@ export default function CompareFunds() {
   const { data: funds, isLoading, error } = useQuery({
     queryKey: ["funds"],
     queryFn: async () => {
-      // In a real app, this would be an API call
-      return mockFunds;
+      try {
+        // Use the API service to fetch funds
+        return await fetchFunds();
+      } catch (error) {
+        toast({
+          title: "Error fetching funds",
+          description: error instanceof Error ? error.message : "An unknown error occurred",
+          variant: "destructive",
+        });
+        throw error;
+      }
     },
   });
 
   const handleSelectFund = (fund: FundData) => {
     if (selectedFunds.length >= 4) {
-      // Show a toast or alert that max 4 funds can be compared at once
-      console.log("Maximum 4 funds can be compared at once");
+      toast({
+        title: "Maximum funds reached",
+        description: "You can compare up to 4 funds at once",
+        variant: "warning",
+      });
       return;
     }
     
@@ -45,7 +56,7 @@ export default function CompareFunds() {
     setSelectedFunds(selectedFunds.filter((fund) => fund.id !== fundId));
   };
 
-  // Create a buttonLabel as React element - fixing the TS error
+  // Create a buttonLabel as React element
   const addFundButtonLabel = (
     <div className="flex items-center gap-2 text-muted-foreground">
       <PlusCircle className="h-4 w-4" />

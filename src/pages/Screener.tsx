@@ -39,7 +39,8 @@ import { Slider } from "@/components/ui/slider";
 import { FundCard } from "@/components/fund-card";
 import { ScreenCard } from "@/components/screen-card";
 import { FundCategory, FundFilters } from "@/lib/types";
-import { filterFunds, getAllAMCs } from "@/lib/mock-data";
+import { fetchFunds, fetchAllAMCs } from "@/lib/api";
+import { toast } from "@/components/ui/use-toast";
 
 export default function Screener() {
   // State for filters
@@ -52,8 +53,17 @@ export default function Screener() {
   const { data: funds, isLoading, error } = useQuery({
     queryKey: ["funds", filters],
     queryFn: async () => {
-      // Filter the mock data with the current filters
-      return filterFunds({ ...filters, searchQuery });
+      try {
+        // Use the API service to fetch funds with filters
+        return await fetchFunds({ ...filters, searchQuery });
+      } catch (error) {
+        toast({
+          title: "Error fetching funds",
+          description: error instanceof Error ? error.message : "An unknown error occurred",
+          variant: "destructive",
+        });
+        throw error;
+      }
     },
   });
 
@@ -61,7 +71,16 @@ export default function Screener() {
   const { data: amcs } = useQuery({
     queryKey: ["amcs"],
     queryFn: async () => {
-      return getAllAMCs();
+      try {
+        return await fetchAllAMCs();
+      } catch (error) {
+        toast({
+          title: "Error fetching AMCs",
+          description: "Could not load AMC filter options",
+          variant: "destructive",
+        });
+        return [];
+      }
     },
   });
 

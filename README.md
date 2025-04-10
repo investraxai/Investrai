@@ -1,73 +1,110 @@
-# Welcome to your Lovable project
 
-## Project info
+# Mutual Fund Screener Application
 
-**URL**: https://lovable.dev/projects/4b2bb498-88dc-47fb-8b8a-77b7f2c12b6d
+A full-stack application for researching, comparing, and tracking mutual funds with advanced screening and visualization capabilities.
 
-## How can I edit this code?
+## Features
 
-There are several ways of editing your application.
+- Fund screening with multiple filters (category, AMC, returns, expense ratio, etc.)
+- Fund comparison tools with interactive charts and 3D visualizations
+- Pre-defined screens for quick access to popular fund combinations
+- Performance metrics and trend analysis
 
-**Use Lovable**
+## Tech Stack
 
-Simply visit the [Lovable Project](https://lovable.dev/projects/4b2bb498-88dc-47fb-8b8a-77b7f2c12b6d) and start prompting.
+### Frontend
+- React + TypeScript
+- Tailwind CSS with Shadcn UI components
+- React Query for data fetching and state management
+- React Three Fiber for 3D visualizations
+- Recharts for data visualization
 
-Changes made via Lovable will be committed automatically to this repo.
+### Backend
+- Django REST Framework
+- SQLite for development (PostgreSQL recommended for production)
+- Custom data importing services
 
-**Use your preferred IDE**
+## Project Structure
 
-If you want to work locally using your own IDE, you can clone this repo and push changes. Pushed changes will also be reflected in Lovable.
-
-The only requirement is having Node.js & npm installed - [install with nvm](https://github.com/nvm-sh/nvm#installing-and-updating)
-
-Follow these steps:
-
-```sh
-# Step 1: Clone the repository using the project's Git URL.
-git clone <YOUR_GIT_URL>
-
-# Step 2: Navigate to the project directory.
-cd <YOUR_PROJECT_NAME>
-
-# Step 3: Install the necessary dependencies.
-npm i
-
-# Step 4: Start the development server with auto-reloading and an instant preview.
-npm run dev
+```
+├── public/                # Static assets
+├── src/
+│   ├── backend/           # Django backend code
+│   │   ├── fund_api/      # Django project settings
+│   │   ├── funds/         # Funds app
+│   │   └── ...
+│   ├── components/        # React components
+│   ├── frontend/          # Frontend-specific code
+│   ├── lib/               # Shared utilities and types
+│   └── pages/             # Page components
 ```
 
-**Edit a file directly in GitHub**
+## Getting Started
 
-- Navigate to the desired file(s).
-- Click the "Edit" button (pencil icon) at the top right of the file view.
-- Make your changes and commit the changes.
+### Frontend
 
-**Use GitHub Codespaces**
+1. Install dependencies:
+   ```
+   npm install
+   ```
 
-- Navigate to the main page of your repository.
-- Click on the "Code" button (green button) near the top right.
-- Select the "Codespaces" tab.
-- Click on "New codespace" to launch a new Codespace environment.
-- Edit files directly within the Codespace and commit and push your changes once you're done.
+2. Start development server:
+   ```
+   npm run dev
+   ```
 
-## What technologies are used for this project?
+### Backend
 
-This project is built with:
+1. Navigate to the backend directory:
+   ```
+   cd src/backend
+   ```
 
-- Vite
-- TypeScript
-- React
-- shadcn-ui
-- Tailwind CSS
+2. Create a virtual environment:
+   ```
+   python -m venv venv
+   source venv/bin/activate  # On Windows: venv\Scripts\activate
+   ```
 
-## How can I deploy this project?
+3. Install dependencies:
+   ```
+   pip install -r requirements.txt
+   ```
 
-Simply open [Lovable](https://lovable.dev/projects/4b2bb498-88dc-47fb-8b8a-77b7f2c12b6d) and click on Share -> Publish.
+4. Set up environment variables:
+   ```
+   cp .env.example .env
+   # Edit the .env file with your settings
+   ```
 
-## Can I connect a custom domain to my Lovable project?
+5. Run migrations:
+   ```
+   python manage.py makemigrations
+   python manage.py migrate
+   ```
 
-Yes it is!
+6. Load initial data:
+   ```
+   python fund_data_service.py
+   ```
 
-To connect a domain, navigate to Project > Settings > Domains and click Connect Domain.
+7. Start the development server:
+   ```
+   python manage.py runserver
+   ```
 
-Read more here: [Setting up a custom domain](https://docs.lovable.dev/tips-tricks/custom-domain#step-by-step-guide)
+## Deployment
+
+See the deployment guides in the `src/backend/deployment_guide.md` file for detailed instructions on deploying the backend.
+
+## API Endpoints
+
+- `GET /api/funds/` - List and filter mutual funds
+- `GET /api/funds/{id}/` - Get details for a specific fund
+- `GET /api/top-funds/` - Get top performing funds
+- `GET /api/amcs/` - Get list of all AMCs
+- `GET /api/refresh-data/` - Refresh fund data from external API
+
+## License
+
+MIT
