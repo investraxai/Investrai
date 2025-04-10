@@ -9,7 +9,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 interface FundSelectorProps {
   funds: FundData[];
   onSelect: (fund: FundData) => void;
-  buttonLabel: string;
+  buttonLabel: React.ReactNode; // Changed from string to ReactNode
 }
 
 export function FundSelector({ funds, onSelect, buttonLabel }: FundSelectorProps) {
