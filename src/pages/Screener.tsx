@@ -1,14 +1,17 @@
 
-import { useState, useEffect } from "react";
-import { FundCard } from "@/components/fund-card";
-import { mockFunds, filterFunds, getAllAMCs } from "@/lib/mock-data";
-import { FundData, FundCategory, FundFilters } from "@/lib/types";
-import { Input } from "@/components/ui/input";
+import { useState } from "react";
+import { useQuery } from "@tanstack/react-query";
+import { Search, Check, Filter, ChevronRight, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Card, CardContent } from "@/components/ui/card";
-import { Search, SlidersHorizontal, X, ArrowRight, Users } from "lucide-react";
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import { 
+  Select, 
+  SelectContent, 
+  SelectItem, 
+  SelectTrigger, 
+  SelectValue 
+} from "@/components/ui/select";
 import {
   Sheet,
   SheetContent,
@@ -17,421 +20,483 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from "@/components/ui/hover-card";
+import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Separator } from "@/components/ui/separator";
+import { Slider } from "@/components/ui/slider";
+import { FundCard } from "@/components/fund-card";
 import { ScreenCard } from "@/components/screen-card";
-import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
-import { Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
-import { useNavigate } from "react-router-dom";
+import { FundCategory, FundFilters } from "@/lib/types";
+import { filterFunds, getAllAMCs } from "@/lib/mock-data";
 
-const Screener = () => {
-  const [filteredFunds, setFilteredFunds] = useState<FundData[]>(mockFunds);
-  const [amcs, setAMCs] = useState<string[]>([]);
-  const [searchQuery, setSearchQuery] = useState("");
+export default function Screener() {
+  // State for filters
   const [filters, setFilters] = useState<FundFilters>({});
-  const [commandOpen, setCommandOpen] = useState(false);
-  const navigate = useNavigate();
-  
-  useEffect(() => {
-    // Get all AMCs for the filter dropdown
-    setAMCs(getAllAMCs());
-    
-    // Apply initial filtering if any
-    applyFilters();
-  }, []);
-  
-  const applyFilters = () => {
-    // Include search query in filters
-    const updatedFilters = { ...filters, searchQuery };
-    setFilteredFunds(filterFunds(updatedFilters));
+  const [searchQuery, setSearchQuery] = useState("");
+  const [isFiltersOpen, setIsFiltersOpen] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
+
+  // Fetch funds data
+  const { data: funds, isLoading, error } = useQuery({
+    queryKey: ["funds", filters],
+    queryFn: async () => {
+      // Filter the mock data with the current filters
+      return filterFunds({ ...filters, searchQuery });
+    },
+  });
+
+  // Fetch AMCs for filter dropdown
+  const { data: amcs } = useQuery({
+    queryKey: ["amcs"],
+    queryFn: async () => {
+      return getAllAMCs();
+    },
+  });
+
+  // Handler to apply filters
+  const applyFilters = (newFilters: FundFilters) => {
+    setFilters({ ...filters, ...newFilters });
+    setIsFiltersOpen(false);
   };
-  
-  const resetFilters = () => {
+
+  // Handler to clear all filters
+  const clearFilters = () => {
     setFilters({});
     setSearchQuery("");
-    setFilteredFunds(mockFunds);
   };
-  
-  const handleSearch = (e: React.FormEvent) => {
-    e.preventDefault();
-    applyFilters();
-  };
-  
-  const updateFilter = (key: keyof FundFilters, value: any) => {
-    setFilters(prev => ({ ...prev, [key]: value }));
-  };
-  
-  const categories: FundCategory[] = [
-    "Equity",
-    "Debt",
-    "Hybrid",
-    "Solution Oriented",
-    "Other",
-  ];
 
+  // Check if any filters are applied
+  const hasFilters = Object.keys(filters).length > 0 || searchQuery;
+
+  // Predefined screens for quick selection
   const popularScreens = [
     {
-      id: "tax-savers",
-      title: "Tax Savers",
-      icon: "🟩",
-      description: "Funds that help you save tax and build wealth at the same time.",
-      criteria: ["Equity Linked Savings Scheme (ELSS)", "Alpha"],
-      users: "362K+",
-      filters: { category: "Equity", subCategory: "ELSS" }
+      title: "Top Performing Equity",
+      description: "Equity funds with over 15% 1Y returns",
+      filters: {
+        category: "Equity" as FundCategory,
+        minReturn1Y: 15,
+      },
+      icon: "📈",
     },
     {
-      id: "long-term-compounders",
-      title: "Long Term Compounders",
-      icon: "🔴",
-      description: "Funds with a long history of outperformance & a large cap bias",
-      criteria: ["CAGR 5Y", "Time since inception"],
-      users: "566K+",
-      filters: { minReturn5Y: 12 }
-    },
-    {
-      id: "bolder-bets",
-      title: "Bolder Bets",
-      icon: "🟦",
-      description: "Funds with bold multicap strategies giving better returns than their peers.",
-      criteria: ["3Y Average Rolling Return", "Return vs Sub-Category"],
-      users: "91K+",
-      filters: { category: "Equity", minReturn3Y: 15 }
-    }
-  ];
-
-  const equityScreens = [
-    {
-      id: "efficient-equity",
-      title: "Efficient Equity Picks",
-      icon: "📊",
-      description: "Funds with low expense ratios & healthy risk adjusted returns",
-      criteria: ["Alpha", "Sharpe Ratio"],
-      users: "239K+",
-      filters: { category: "Equity", maxExpenseRatio: 1.0 }
-    },
-    {
-      id: "value-picks",
-      title: "Value Picks",
+      title: "Low Cost Debt Funds",
+      description: "Debt funds with expense ratio under 0.5%",
+      filters: {
+        category: "Debt" as FundCategory,
+        maxExpenseRatio: 0.5,
+      },
       icon: "💰",
-      description: "Funds available at a better valuation than their category average & peers.",
-      criteria: ["PE Ratio", "Sortino Ratio"],
-      users: "287K+",
-      filters: { category: "Equity", subCategory: "Value" }
     },
     {
-      id: "consistent-performers",
-      title: "Consistent Out-performers",
-      icon: "🏆",
-      description: "Funds with long term outperformance & low volatility",
-      criteria: ["Return vs Sub-Category", "5Y", "Volatility"],
-      users: "84.6K+",
-      filters: { minReturn5Y: 10, minReturn3Y: 12, minReturn1Y: 15 }
-    }
+      title: "Large Cap Funds",
+      description: "Equity large cap funds for stable growth",
+      filters: {
+        category: "Equity" as FundCategory,
+        subCategory: "Large Cap",
+      },
+      icon: "🏢",
+    },
+    {
+      title: "Long-term Performers",
+      description: "Funds with 5Y returns above 12%",
+      filters: {
+        minReturn5Y: 12,
+      },
+      icon: "🌟",
+    },
   ];
   
+  const equityScreens = [
+    {
+      title: "Multi Cap Funds",
+      description: "Diversified across market caps",
+      filters: {
+        category: "Equity" as FundCategory,
+        subCategory: "Multi Cap",
+      },
+      icon: "🔄",
+    },
+    {
+      title: "Small Cap High Growth",
+      description: "Small cap funds with high growth potential",
+      filters: {
+        category: "Equity" as FundCategory,
+        subCategory: "Small Cap",
+      },
+      icon: "🚀",
+    },
+    {
+      title: "ELSS Tax Savers",
+      description: "Tax-saving equity funds under Sec 80C",
+      filters: {
+        category: "Equity" as FundCategory,
+        subCategory: "ELSS",
+      },
+      icon: "🧾",
+    },
+    {
+      title: "3Y Strong Performers",
+      description: "Equity funds with 3Y returns over 12%",
+      filters: {
+        category: "Equity" as FundCategory,
+        minReturn3Y: 12,
+      },
+      icon: "📊",
+    },
+  ];
+
   return (
-    <div className="container px-4 py-8 md:px-6">
-      <div className="mb-8 space-y-4">
-        <h1 className="text-3xl font-bold tracking-tight">Fund Screener</h1>
+    <div className="container py-6 md:py-8">
+      <div className="mb-6">
+        <h1 className="mb-2 text-3xl font-bold tracking-tight">Fund Screener</h1>
         <p className="text-muted-foreground">
-          Filter and find the perfect mutual funds based on your investment criteria.
+          Find and filter mutual funds based on your investment criteria
         </p>
       </div>
-      
-      <div className="mb-8 flex flex-col gap-4">
-        <div className="relative w-full">
-          <div 
-            className="relative flex items-center rounded-lg border bg-background px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 cursor-text"
-            onClick={() => setCommandOpen(true)}  
-          >
-            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
-            <span className="text-muted-foreground">Search funds or use filters...</span>
-          </div>
-          
-          <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
-            <CommandInput placeholder="Search funds by name, AMC, or category..." />
-            <CommandList>
-              <CommandEmpty>No results found.</CommandEmpty>
-              <CommandGroup heading="Recent Searches">
-                {mockFunds.slice(0, 5).map(fund => (
-                  <CommandItem 
-                    key={fund.id} 
-                    onSelect={() => {
-                      navigate(`/fund/${fund.id}`);
-                      setCommandOpen(false);
-                    }}
-                  >
-                    <div className="flex flex-col">
-                      <span>{fund.scheme_name}</span>
-                      <span className="text-xs text-muted-foreground">{fund.amc} • {fund.category}</span>
-                    </div>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-              <CommandGroup heading="Categories">
-                {categories.map(category => (
-                  <CommandItem 
-                    key={category}
-                    onSelect={() => {
-                      updateFilter("category", category);
-                      setCommandOpen(false);
-                      applyFilters();
-                    }}
-                  >
-                    {category}
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            </CommandList>
-          </CommandDialog>
-        </div>
-        
-        <div className="flex flex-wrap items-center gap-2">
-          <Sheet>
-            <SheetTrigger asChild>
-              <Button variant="outline" className="gap-2">
-                <SlidersHorizontal className="h-4 w-4" />
-                <span>Filters</span>
+
+      {/* Search & Filter Bar */}
+      <div className="mb-8 flex flex-wrap gap-3">
+        {/* Search Dialog */}
+        <Dialog open={isSearchOpen} onOpenChange={setIsSearchOpen}>
+          <DialogTrigger asChild>
+            <Button variant="outline" className="w-full sm:w-auto">
+              <Search className="mr-2 h-4 w-4" />
+              Search Funds
+            </Button>
+          </DialogTrigger>
+          <DialogContent className="sm:max-w-md">
+            <DialogHeader>
+              <DialogTitle>Search Funds</DialogTitle>
+              <DialogDescription>
+                Search by fund name or AMC
+              </DialogDescription>
+            </DialogHeader>
+            <div className="flex items-center space-x-2">
+              <div className="grid flex-1 gap-2">
+                <Input
+                  placeholder="Enter fund name or AMC..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                />
+              </div>
+              <Button 
+                type="submit"
+                onClick={() => {
+                  setFilters({ ...filters, searchQuery });
+                  setIsSearchOpen(false);
+                }}
+              >
+                Search
               </Button>
-            </SheetTrigger>
-            <SheetContent className="w-[300px] sm:w-[540px]">
-              <SheetHeader>
-                <SheetTitle>Filter Funds</SheetTitle>
-                <SheetDescription>
-                  Apply criteria to narrow down your search.
-                </SheetDescription>
-              </SheetHeader>
-              <div className="my-6 grid gap-5">
-                <div className="grid gap-2">
-                  <Label htmlFor="category">Category</Label>
-                  <Select
-                    value={filters.category || "all_categories"}
-                    onValueChange={(value) => 
-                      updateFilter("category", value === "all_categories" ? undefined : value as FundCategory)
-                    }
-                  >
-                    <SelectTrigger id="category">
-                      <SelectValue placeholder="All Categories" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all_categories">All Categories</SelectItem>
-                      {categories.map((category) => (
-                        <SelectItem key={category} value={category}>{category}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="amc">AMC</Label>
-                  <Select
-                    value={filters.amc || "all_amcs"}
-                    onValueChange={(value) => 
-                      updateFilter("amc", value === "all_amcs" ? undefined : value)
-                    }
-                  >
-                    <SelectTrigger id="amc">
-                      <SelectValue placeholder="All AMCs" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all_amcs">All AMCs</SelectItem>
-                      {amcs.map((amc) => (
-                        <SelectItem key={amc} value={amc}>{amc}</SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label>1 Year Return (%)</Label>
-                  <div className="flex items-center gap-4">
-                    <Input
-                      type="number"
-                      placeholder="Min"
-                      value={filters.minReturn1Y || ""}
-                      onChange={(e) => 
-                        updateFilter("minReturn1Y", e.target.value ? Number(e.target.value) : undefined)
-                      }
-                      className="w-24"
-                    />
-                    <span>to</span>
-                    <Input
-                      type="number"
-                      placeholder="Max"
-                      value={filters.maxReturn1Y || ""}
-                      onChange={(e) => 
-                        updateFilter("maxReturn1Y", e.target.value ? Number(e.target.value) : undefined)
-                      }
-                      className="w-24"
-                    />
+            </div>
+          </DialogContent>
+        </Dialog>
+
+        {/* Filter Sheet */}
+        <Sheet open={isFiltersOpen} onOpenChange={setIsFiltersOpen}>
+          <SheetTrigger asChild>
+            <Button variant="outline" className="w-full sm:w-auto">
+              <Filter className="mr-2 h-4 w-4" />
+              Filter
+              {hasFilters && (
+                <Badge variant="secondary" className="ml-2">
+                  {Object.keys(filters).length + (searchQuery ? 1 : 0)}
+                </Badge>
+              )}
+            </Button>
+          </SheetTrigger>
+          <SheetContent className="w-full sm:max-w-md overflow-y-auto">
+            <SheetHeader>
+              <SheetTitle>Filter Funds</SheetTitle>
+              <SheetDescription>
+                Narrow down funds based on your criteria
+              </SheetDescription>
+            </SheetHeader>
+            <div className="grid gap-6 py-6">
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium leading-none">Fund Category</h3>
+                <Select 
+                  onValueChange={(value) => 
+                    applyFilters({ category: value as FundCategory })
+                  }
+                  value={filters.category || ""}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select category" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all_categories">All Categories</SelectItem>
+                    <SelectItem value="Equity">Equity</SelectItem>
+                    <SelectItem value="Debt">Debt</SelectItem>
+                    <SelectItem value="Hybrid">Hybrid</SelectItem>
+                    <SelectItem value="Solution Oriented">Solution Oriented</SelectItem>
+                    <SelectItem value="Other">Other</SelectItem>
+                  </SelectContent>
+                </Select>
+                {filters.category && (
+                  <div className="pt-2">
+                    <Button variant="ghost" size="sm" onClick={() => 
+                      setFilters({ ...filters, category: undefined })
+                    }>
+                      Clear Category
+                    </Button>
                   </div>
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label>Expense Ratio (%)</Label>
-                  <div className="flex items-center gap-4">
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="Min"
-                      value={filters.minExpenseRatio || ""}
-                      onChange={(e) => 
-                        updateFilter("minExpenseRatio", e.target.value ? Number(e.target.value) : undefined)
-                      }
-                      className="w-24"
-                    />
-                    <span>to</span>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      placeholder="Max"
-                      value={filters.maxExpenseRatio || ""}
-                      onChange={(e) => 
-                        updateFilter("maxExpenseRatio", e.target.value ? Number(e.target.value) : undefined)
-                      }
-                      className="w-24"
-                    />
+                )}
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium leading-none">Asset Management Company</h3>
+                <Select 
+                  onValueChange={(value) => 
+                    applyFilters({ amc: value === "all_amcs" ? undefined : value })
+                  }
+                  value={filters.amc || ""}
+                >
+                  <SelectTrigger>
+                    <SelectValue placeholder="Select AMC" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all_amcs">All AMCs</SelectItem>
+                    {amcs?.map((amc) => (
+                      <SelectItem key={amc} value={amc}>
+                        {amc}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {filters.amc && (
+                  <div className="pt-2">
+                    <Button variant="ghost" size="sm" onClick={() => 
+                      setFilters({ ...filters, amc: undefined })
+                    }>
+                      Clear AMC
+                    </Button>
                   </div>
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label>AUM Size (₹ Cr)</Label>
-                  <div className="flex items-center gap-4">
-                    <Input
-                      type="number"
-                      placeholder="Min"
-                      value={filters.minAUM || ""}
-                      onChange={(e) => 
-                        updateFilter("minAUM", e.target.value ? Number(e.target.value) : undefined)
+                )}
+              </div>
+
+              <Separator />
+
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium leading-none">1Y Returns</h3>
+                <div className="pt-4">
+                  <Slider
+                    defaultValue={[filters.minReturn1Y || 0]}
+                    min={-20}
+                    max={50}
+                    step={1}
+                    onValueChange={(values) => {
+                      if (values[0] <= -20) {
+                        setFilters({ ...filters, minReturn1Y: undefined });
+                      } else {
+                        setFilters({ ...filters, minReturn1Y: values[0] });
                       }
-                      className="w-24"
-                    />
-                    <span>to</span>
-                    <Input
-                      type="number"
-                      placeholder="Max"
-                      value={filters.maxAUM || ""}
-                      onChange={(e) => 
-                        updateFilter("maxAUM", e.target.value ? Number(e.target.value) : undefined)
-                      }
-                      className="w-24"
-                    />
+                    }}
+                  />
+                  <div className="mt-2 flex items-center justify-between text-sm">
+                    <div>Min: {filters.minReturn1Y !== undefined ? `${filters.minReturn1Y}%` : "Any"}</div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setFilters({ ...filters, minReturn1Y: undefined })}
+                      disabled={filters.minReturn1Y === undefined}
+                    >
+                      Reset
+                    </Button>
                   </div>
-                </div>
-                
-                <div className="grid gap-2">
-                  <Label htmlFor="aumCategory">AUM Category</Label>
-                  <Select
-                    value={filters.aumCategory || "all_aum_categories"}
-                    onValueChange={(value) => 
-                      updateFilter("aumCategory", value === "all_aum_categories" ? undefined : value)
-                    }
-                  >
-                    <SelectTrigger id="aumCategory">
-                      <SelectValue placeholder="All AUM Categories" />
-                    </SelectTrigger>
-                    <SelectContent>
-                      <SelectItem value="all_aum_categories">All AUM Categories</SelectItem>
-                      <SelectItem value="Small">Small</SelectItem>
-                      <SelectItem value="Mid">Mid</SelectItem>
-                      <SelectItem value="Large">Large</SelectItem>
-                    </SelectContent>
-                  </Select>
-                </div>
-                
-                <div className="flex justify-between pt-4">
-                  <Button variant="outline" onClick={resetFilters}>
-                    Reset
-                  </Button>
-                  <Button onClick={() => {
-                    applyFilters();
-                    document.getElementById("fund-results")?.scrollIntoView({ behavior: "smooth" });
-                  }}>
-                    Apply Filters
-                  </Button>
                 </div>
               </div>
-            </SheetContent>
-          </Sheet>
-          
-          {Object.keys(filters).length > 0 && (
-            <Button variant="ghost" size="sm" onClick={resetFilters} className="h-9">
-              <X className="mr-1 h-4 w-4" />
-              Clear
-            </Button>
+
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium leading-none">3Y Returns</h3>
+                <div className="pt-4">
+                  <Slider
+                    defaultValue={[filters.minReturn3Y || 0]}
+                    min={-10}
+                    max={30}
+                    step={1}
+                    onValueChange={(values) => {
+                      if (values[0] <= -10) {
+                        setFilters({ ...filters, minReturn3Y: undefined });
+                      } else {
+                        setFilters({ ...filters, minReturn3Y: values[0] });
+                      }
+                    }}
+                  />
+                  <div className="mt-2 flex items-center justify-between text-sm">
+                    <div>Min: {filters.minReturn3Y !== undefined ? `${filters.minReturn3Y}%` : "Any"}</div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setFilters({ ...filters, minReturn3Y: undefined })}
+                      disabled={filters.minReturn3Y === undefined}
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="space-y-4">
+                <h3 className="text-sm font-medium leading-none">Expense Ratio</h3>
+                <div className="pt-4">
+                  <Slider
+                    defaultValue={[filters.maxExpenseRatio || 2.5]}
+                    min={0.1}
+                    max={2.5}
+                    step={0.1}
+                    onValueChange={(values) => {
+                      if (values[0] >= 2.5) {
+                        setFilters({ ...filters, maxExpenseRatio: undefined });
+                      } else {
+                        setFilters({ ...filters, maxExpenseRatio: values[0] });
+                      }
+                    }}
+                  />
+                  <div className="mt-2 flex items-center justify-between text-sm">
+                    <div>Max: {filters.maxExpenseRatio !== undefined ? `${filters.maxExpenseRatio}%` : "Any"}</div>
+                    <Button 
+                      variant="ghost" 
+                      size="sm" 
+                      onClick={() => setFilters({ ...filters, maxExpenseRatio: undefined })}
+                      disabled={filters.maxExpenseRatio === undefined}
+                    >
+                      Reset
+                    </Button>
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex justify-between pt-4">
+                <Button variant="outline" onClick={clearFilters}>
+                  Clear All
+                </Button>
+                <Button onClick={() => setIsFiltersOpen(false)}>
+                  Apply Filters
+                </Button>
+              </div>
+            </div>
+          </SheetContent>
+        </Sheet>
+
+        {/* Clear filters button */}
+        {hasFilters && (
+          <Button variant="ghost" onClick={clearFilters} className="ml-auto">
+            Clear All Filters
+          </Button>
+        )}
+      </div>
+
+      {/* Quick Access Predefined Screens */}
+      <div className="mb-8">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Popular Screens</h2>
+          <Button variant="link" size="sm" className="flex items-center">
+            See All <ChevronRight className="ml-1 h-4 w-4" />
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+          {popularScreens.map((screen, index) => (
+            <ScreenCard
+              key={index}
+              title={screen.title}
+              description={screen.description}
+              icon={screen.icon}
+              onClick={() => setFilters(screen.filters)}
+            />
+          ))}
+        </div>
+      </div>
+
+      <div className="mb-8">
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Equity Focused Screens</h2>
+          <Button variant="link" size="sm" className="flex items-center">
+            See All <ChevronRight className="ml-1 h-4 w-4" />
+          </Button>
+        </div>
+        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 md:grid-cols-4">
+          {equityScreens.map((screen, index) => (
+            <ScreenCard
+              key={index}
+              title={screen.title}
+              description={screen.description}
+              icon={screen.icon}
+              onClick={() => setFilters(screen.filters)}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Fund Results */}
+      <div>
+        <div className="mb-4 flex items-center justify-between">
+          <h2 className="text-xl font-semibold">Fund Results</h2>
+          {funds && (
+            <span className="text-sm text-muted-foreground">
+              {funds.length} funds found
+            </span>
           )}
         </div>
-      </div>
 
-      {/* Popular Screens Section */}
-      <div className="mb-16">
-        <h2 className="text-2xl font-bold tracking-tight mb-6">Popular Screens</h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {popularScreens.map(screen => (
-            <ScreenCard 
-              key={screen.id}
-              title={screen.title}
-              icon={screen.icon}
-              description={screen.description}
-              criteria={screen.criteria}
-              usersCount={screen.users}
-              onClick={() => {
-                setFilters(screen.filters);
-                applyFilters();
-                document.getElementById("fund-results")?.scrollIntoView({ behavior: "smooth" });
-              }}
-            />
-          ))}
-        </div>
-      </div>
+        {/* Show error message if there's an error */}
+        {error && (
+          <Alert variant="destructive">
+            <AlertCircle className="h-4 w-4" />
+            <AlertTitle>Error</AlertTitle>
+            <AlertDescription>
+              Failed to load funds. Please try again later.
+            </AlertDescription>
+          </Alert>
+        )}
 
-      {/* Equity Focused Screens Section */}
-      <div className="mb-16">
-        <h2 className="text-2xl font-bold tracking-tight mb-6">Equity Focused Screens</h2>
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {equityScreens.map(screen => (
-            <ScreenCard 
-              key={screen.id}
-              title={screen.title}
-              icon={screen.icon}
-              description={screen.description}
-              criteria={screen.criteria}
-              usersCount={screen.users}
-              onClick={() => {
-                setFilters(screen.filters);
-                applyFilters();
-                document.getElementById("fund-results")?.scrollIntoView({ behavior: "smooth" });
-              }}
-            />
-          ))}
-        </div>
-      </div>
-      
-      {/* Fund Results Section */}
-      <div id="fund-results" className="mb-4 text-sm text-muted-foreground">
-        Showing {filteredFunds.length} funds
-      </div>
-      
-      {filteredFunds.length > 0 ? (
-        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-          {filteredFunds.slice(0, 30).map(fund => (
-            <FundCard key={fund.id} fund={fund} />
-          ))}
-        </div>
-      ) : (
-        <Card className="my-8">
-          <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-            <div className="mb-4 rounded-full bg-muted p-6">
-              <Search className="h-10 w-10 text-muted-foreground" />
+        {/* Show loading state if loading */}
+        {isLoading && (
+          <div className="text-center py-8">
+            <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
+            <p className="mt-4 text-muted-foreground">Loading funds...</p>
+          </div>
+        )}
+
+        {/* Show funds grid */}
+        {funds && funds.length > 0 && (
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+            {funds.map((fund) => (
+              <FundCard key={fund.id} fund={fund} />
+            ))}
+          </div>
+        )}
+
+        {/* Show no results message */}
+        {funds && funds.length === 0 && (
+          <div className="text-center py-8 border rounded-md">
+            <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-muted">
+              <Filter className="h-6 w-6 text-muted-foreground" />
             </div>
-            <h3 className="mb-2 text-xl font-semibold">No funds found</h3>
-            <p className="mb-6 text-muted-foreground">
-              Try adjusting your search or filter criteria
+            <h3 className="mt-4 text-lg font-medium">No funds found</h3>
+            <p className="mt-2 mb-4 text-sm text-muted-foreground max-w-sm mx-auto">
+              Try adjusting your filters or search query to see more results.
             </p>
-            <Button onClick={resetFilters}>Reset Filters</Button>
-          </CardContent>
-        </Card>
-      )}
+            <Button onClick={clearFilters} variant="outline">
+              Clear All Filters
+            </Button>
+          </div>
+        )}
+      </div>
     </div>
   );
-};
-
-export default Screener;
+}

@@ -10,8 +10,8 @@ import { ComparisonTable } from "@/components/comparison-table";
 import { ComparisonChart } from "@/components/comparison-chart";
 import { FundData } from "@/lib/types";
 
-// Import mock data (replace with actual API call in production)
-import { mockFundData } from "@/lib/mock-data";
+// Import mock data with the correct name
+import { mockFunds } from "@/lib/mock-data";
 
 export default function CompareFunds() {
   const [selectedFunds, setSelectedFunds] = useState<FundData[]>([]);
@@ -21,7 +21,7 @@ export default function CompareFunds() {
     queryKey: ["funds"],
     queryFn: async () => {
       // In a real app, this would be an API call
-      return mockFundData;
+      return mockFunds;
     },
   });
 
