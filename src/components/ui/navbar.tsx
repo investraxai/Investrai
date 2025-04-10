@@ -27,6 +27,9 @@ export function Navbar() {
           <Link to="/screener" className="text-sm font-medium text-muted-foreground hover:text-primary">
             Screener
           </Link>
+          <Link to="/compare" className="text-sm font-medium text-muted-foreground hover:text-primary">
+            Compare Funds
+          </Link>
         </div>
 
         {/* Desktop Search */}
@@ -86,6 +89,13 @@ export function Navbar() {
                 onClick={() => setIsMenuOpen(false)}
               >
                 Screener
+              </Link>
+              <Link
+                to="/compare"
+                className="flex items-center py-2 text-sm font-medium text-muted-foreground hover:text-primary"
+                onClick={() => setIsMenuOpen(false)}
+              >
+                Compare Funds
               </Link>
             </div>
           </div>
