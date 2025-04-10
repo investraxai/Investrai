@@ -1,3 +1,4 @@
+
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, Info, PlusCircle } from "lucide-react";
@@ -7,6 +8,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { FundSelector, FundSelectedBadge } from "@/components/fund-selector";
 import { ComparisonTable } from "@/components/comparison-table";
 import { ComparisonChart } from "@/components/comparison-chart";
+import { FundPerformance3D } from "@/components/visualizations/FundPerformance3D";
 import { FundData } from "@/lib/types";
 
 // Import mock data with the correct name
@@ -43,7 +45,7 @@ export default function CompareFunds() {
     setSelectedFunds(selectedFunds.filter((fund) => fund.id !== fundId));
   };
 
-  // Create a buttonLabel as React element
+  // Create a buttonLabel as React element - fixing the TS error
   const addFundButtonLabel = (
     <div className="flex items-center gap-2 text-muted-foreground">
       <PlusCircle className="h-4 w-4" />
@@ -126,12 +128,16 @@ export default function CompareFunds() {
             <TabsList>
               <TabsTrigger value="table">Table View</TabsTrigger>
               <TabsTrigger value="chart">Performance Chart</TabsTrigger>
+              <TabsTrigger value="3d">3D Visualization</TabsTrigger>
             </TabsList>
             <TabsContent value="table" className="mt-6">
               <ComparisonTable funds={selectedFunds} />
             </TabsContent>
             <TabsContent value="chart" className="mt-6">
               <ComparisonChart funds={selectedFunds} />
+            </TabsContent>
+            <TabsContent value="3d" className="mt-6">
+              <FundPerformance3D funds={selectedFunds} />
             </TabsContent>
           </Tabs>
         </div>
