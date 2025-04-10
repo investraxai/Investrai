@@ -7,8 +7,8 @@ interface ScreenCardProps {
   title: string;
   icon: string;
   description: string;
-  criteria: string[];
-  usersCount: string;
+  criteria?: string[];
+  usersCount?: string;
   onClick: () => void;
   isPro?: boolean;
 }
@@ -17,8 +17,8 @@ export function ScreenCard({
   title,
   icon,
   description,
-  criteria,
-  usersCount,
+  criteria = [],
+  usersCount = "0",
   onClick,
   isPro = false
 }: ScreenCardProps) {
@@ -41,26 +41,28 @@ export function ScreenCard({
           )}
         </div>
         
-        <div className="mb-4 border rounded-lg p-2 bg-gray-50">
-          {criteria.map((criterion, i) => (
-            <span key={i} className="text-sm">
-              {criterion}
-              {i < criteria.length - 1 && <span className="mx-1">•</span>}
-              {i === criteria.length - 2 && criteria.length > 2 && (
-                <HoverCard>
-                  <HoverCardTrigger asChild>
-                    <span className="text-xs text-purple-700 cursor-help">+{criteria.length - 2} more</span>
-                  </HoverCardTrigger>
-                  <HoverCardContent className="w-80">
-                    <div className="text-sm">
-                      Additional criteria used for this screen
-                    </div>
-                  </HoverCardContent>
-                </HoverCard>
-              )}
-            </span>
-          ))}
-        </div>
+        {criteria && criteria.length > 0 && (
+          <div className="mb-4 border rounded-lg p-2 bg-gray-50">
+            {criteria.map((criterion, i) => (
+              <span key={i} className="text-sm">
+                {criterion}
+                {i < criteria.length - 1 && <span className="mx-1">•</span>}
+                {i === criteria.length - 2 && criteria.length > 2 && (
+                  <HoverCard>
+                    <HoverCardTrigger asChild>
+                      <span className="text-xs text-purple-700 cursor-help">+{criteria.length - 2} more</span>
+                    </HoverCardTrigger>
+                    <HoverCardContent className="w-80">
+                      <div className="text-sm">
+                        Additional criteria used for this screen
+                      </div>
+                    </HoverCardContent>
+                  </HoverCard>
+                )}
+              </span>
+            ))}
+          </div>
+        )}
         
         <p className="mb-4 text-sm text-muted-foreground">{description}</p>
         

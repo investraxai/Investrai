@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { Search, Check, Filter, ChevronRight, AlertCircle } from "lucide-react";
@@ -91,6 +90,8 @@ export default function Screener() {
         minReturn1Y: 15,
       },
       icon: "📈",
+      criteria: ["Equity", "1Y Returns > 15%", "All AMCs"],
+      usersCount: "3.2K"
     },
     {
       title: "Low Cost Debt Funds",
@@ -100,6 +101,8 @@ export default function Screener() {
         maxExpenseRatio: 0.5,
       },
       icon: "💰",
+      criteria: ["Debt", "Expense Ratio < 0.5%", "All AMCs"],
+      usersCount: "1.5K"
     },
     {
       title: "Large Cap Funds",
@@ -109,6 +112,8 @@ export default function Screener() {
         subCategory: "Large Cap",
       },
       icon: "🏢",
+      criteria: ["Equity", "Large Cap", "All AMCs"],
+      usersCount: "4.7K"
     },
     {
       title: "Long-term Performers",
@@ -117,6 +122,8 @@ export default function Screener() {
         minReturn5Y: 12,
       },
       icon: "🌟",
+      criteria: ["5Y Returns > 12%", "All Categories", "All AMCs"],
+      usersCount: "2.8K"
     },
   ];
   
@@ -129,6 +136,8 @@ export default function Screener() {
         subCategory: "Multi Cap",
       },
       icon: "🔄",
+      criteria: ["Equity", "Multi Cap", "All AMCs"],
+      usersCount: "1.9K"
     },
     {
       title: "Small Cap High Growth",
@@ -138,6 +147,8 @@ export default function Screener() {
         subCategory: "Small Cap",
       },
       icon: "🚀",
+      criteria: ["Equity", "Small Cap", "All AMCs"],
+      usersCount: "2.1K"
     },
     {
       title: "ELSS Tax Savers",
@@ -147,6 +158,8 @@ export default function Screener() {
         subCategory: "ELSS",
       },
       icon: "🧾",
+      criteria: ["Equity", "ELSS", "Tax Saving", "Sec 80C"],
+      usersCount: "3.8K"
     },
     {
       title: "3Y Strong Performers",
@@ -156,6 +169,8 @@ export default function Screener() {
         minReturn3Y: 12,
       },
       icon: "📊",
+      criteria: ["Equity", "3Y Returns > 12%", "All AMCs"],
+      usersCount: "2.3K"
     },
   ];
 
@@ -416,6 +431,8 @@ export default function Screener() {
               title={screen.title}
               description={screen.description}
               icon={screen.icon}
+              criteria={screen.criteria}
+              usersCount={screen.usersCount}
               onClick={() => setFilters(screen.filters)}
             />
           ))}
@@ -436,6 +453,8 @@ export default function Screener() {
               title={screen.title}
               description={screen.description}
               icon={screen.icon}
+              criteria={screen.criteria}
+              usersCount={screen.usersCount}
               onClick={() => setFilters(screen.filters)}
             />
           ))}

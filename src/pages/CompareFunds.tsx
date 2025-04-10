@@ -1,4 +1,3 @@
-
 import { useState } from "react";
 import { useQuery } from "@tanstack/react-query";
 import { AlertCircle, Info, PlusCircle } from "lucide-react";
@@ -44,6 +43,14 @@ export default function CompareFunds() {
     setSelectedFunds(selectedFunds.filter((fund) => fund.id !== fundId));
   };
 
+  // Create a buttonLabel as React element
+  const addFundButtonLabel = (
+    <div className="flex items-center gap-2 text-muted-foreground">
+      <PlusCircle className="h-4 w-4" />
+      <span>Add Fund to Compare</span>
+    </div>
+  );
+
   return (
     <div className="container py-6 md:py-8">
       <div className="mb-6">
@@ -85,12 +92,7 @@ export default function CompareFunds() {
                 <FundSelector
                   funds={funds || []}
                   onSelect={handleSelectFund}
-                  buttonLabel={
-                    <div className="flex items-center gap-2 text-muted-foreground">
-                      <PlusCircle className="h-4 w-4" />
-                      <span>Add Fund to Compare</span>
-                    </div>
-                  }
+                  buttonLabel={addFundButtonLabel}
                 />
               )}
             </div>
