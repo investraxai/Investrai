@@ -8,7 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Card, CardContent } from "@/components/ui/card";
-import { Search, SlidersHorizontal, X } from "lucide-react";
+import { Search, SlidersHorizontal, X, ArrowRight, Users } from "lucide-react";
 import {
   Sheet,
   SheetContent,
@@ -17,12 +17,18 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
+import { ScreenCard } from "@/components/screen-card";
+import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
+import { Command, CommandDialog, CommandInput, CommandList, CommandEmpty, CommandGroup, CommandItem } from "@/components/ui/command";
+import { useNavigate } from "react-router-dom";
 
 const Screener = () => {
   const [filteredFunds, setFilteredFunds] = useState<FundData[]>(mockFunds);
   const [amcs, setAMCs] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [filters, setFilters] = useState<FundFilters>({});
+  const [commandOpen, setCommandOpen] = useState(false);
+  const navigate = useNavigate();
   
   useEffect(() => {
     // Get all AMCs for the filter dropdown
@@ -60,6 +66,66 @@ const Screener = () => {
     "Solution Oriented",
     "Other",
   ];
+
+  const popularScreens = [
+    {
+      id: "tax-savers",
+      title: "Tax Savers",
+      icon: "🟩",
+      description: "Funds that help you save tax and build wealth at the same time.",
+      criteria: ["Equity Linked Savings Scheme (ELSS)", "Alpha"],
+      users: "362K+",
+      filters: { category: "Equity", subCategory: "ELSS" }
+    },
+    {
+      id: "long-term-compounders",
+      title: "Long Term Compounders",
+      icon: "🔴",
+      description: "Funds with a long history of outperformance & a large cap bias",
+      criteria: ["CAGR 5Y", "Time since inception"],
+      users: "566K+",
+      filters: { minReturn5Y: 12 }
+    },
+    {
+      id: "bolder-bets",
+      title: "Bolder Bets",
+      icon: "🟦",
+      description: "Funds with bold multicap strategies giving better returns than their peers.",
+      criteria: ["3Y Average Rolling Return", "Return vs Sub-Category"],
+      users: "91K+",
+      filters: { category: "Equity", minReturn3Y: 15 }
+    }
+  ];
+
+  const equityScreens = [
+    {
+      id: "efficient-equity",
+      title: "Efficient Equity Picks",
+      icon: "📊",
+      description: "Funds with low expense ratios & healthy risk adjusted returns",
+      criteria: ["Alpha", "Sharpe Ratio"],
+      users: "239K+",
+      filters: { category: "Equity", maxExpenseRatio: 1.0 }
+    },
+    {
+      id: "value-picks",
+      title: "Value Picks",
+      icon: "💰",
+      description: "Funds available at a better valuation than their category average & peers.",
+      criteria: ["PE Ratio", "Sortino Ratio"],
+      users: "287K+",
+      filters: { category: "Equity", subCategory: "Value" }
+    },
+    {
+      id: "consistent-performers",
+      title: "Consistent Out-performers",
+      icon: "🏆",
+      description: "Funds with long term outperformance & low volatility",
+      criteria: ["Return vs Sub-Category", "5Y", "Volatility"],
+      users: "84.6K+",
+      filters: { minReturn5Y: 10, minReturn3Y: 12, minReturn1Y: 15 }
+    }
+  ];
   
   return (
     <div className="container px-4 py-8 md:px-6">
@@ -70,21 +136,55 @@ const Screener = () => {
         </p>
       </div>
       
-      <div className="mb-6 flex flex-col gap-4 sm:flex-row">
-        <div className="flex-1">
-          <form onSubmit={handleSearch} className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
-            <Input
-              type="search"
-              placeholder="Search by fund name or AMC..."
-              className="pl-9"
-              value={searchQuery}
-              onChange={(e) => setSearchQuery(e.target.value)}
-            />
-          </form>
+      <div className="mb-8 flex flex-col gap-4">
+        <div className="relative w-full">
+          <div 
+            className="relative flex items-center rounded-lg border bg-background px-3 py-2 text-sm ring-offset-background focus-within:ring-2 focus-within:ring-ring focus-within:ring-offset-2 cursor-text"
+            onClick={() => setCommandOpen(true)}  
+          >
+            <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+            <span className="text-muted-foreground">Search funds or use filters...</span>
+          </div>
+          
+          <CommandDialog open={commandOpen} onOpenChange={setCommandOpen}>
+            <CommandInput placeholder="Search funds by name, AMC, or category..." />
+            <CommandList>
+              <CommandEmpty>No results found.</CommandEmpty>
+              <CommandGroup heading="Recent Searches">
+                {mockFunds.slice(0, 5).map(fund => (
+                  <CommandItem 
+                    key={fund.id} 
+                    onSelect={() => {
+                      navigate(`/fund/${fund.id}`);
+                      setCommandOpen(false);
+                    }}
+                  >
+                    <div className="flex flex-col">
+                      <span>{fund.scheme_name}</span>
+                      <span className="text-xs text-muted-foreground">{fund.amc} • {fund.category}</span>
+                    </div>
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+              <CommandGroup heading="Categories">
+                {categories.map(category => (
+                  <CommandItem 
+                    key={category}
+                    onSelect={() => {
+                      updateFilter("category", category);
+                      setCommandOpen(false);
+                      applyFilters();
+                    }}
+                  >
+                    {category}
+                  </CommandItem>
+                ))}
+              </CommandGroup>
+            </CommandList>
+          </CommandDialog>
         </div>
         
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Sheet>
             <SheetTrigger asChild>
               <Button variant="outline" className="gap-2">
@@ -241,7 +341,12 @@ const Screener = () => {
                   <Button variant="outline" onClick={resetFilters}>
                     Reset
                   </Button>
-                  <Button onClick={applyFilters}>Apply Filters</Button>
+                  <Button onClick={() => {
+                    applyFilters();
+                    document.getElementById("fund-results")?.scrollIntoView({ behavior: "smooth" });
+                  }}>
+                    Apply Filters
+                  </Button>
                 </div>
               </div>
             </SheetContent>
@@ -255,8 +360,53 @@ const Screener = () => {
           )}
         </div>
       </div>
+
+      {/* Popular Screens Section */}
+      <div className="mb-16">
+        <h2 className="text-2xl font-bold tracking-tight mb-6">Popular Screens</h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {popularScreens.map(screen => (
+            <ScreenCard 
+              key={screen.id}
+              title={screen.title}
+              icon={screen.icon}
+              description={screen.description}
+              criteria={screen.criteria}
+              usersCount={screen.users}
+              onClick={() => {
+                setFilters(screen.filters);
+                applyFilters();
+                document.getElementById("fund-results")?.scrollIntoView({ behavior: "smooth" });
+              }}
+            />
+          ))}
+        </div>
+      </div>
+
+      {/* Equity Focused Screens Section */}
+      <div className="mb-16">
+        <h2 className="text-2xl font-bold tracking-tight mb-6">Equity Focused Screens</h2>
+        <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
+          {equityScreens.map(screen => (
+            <ScreenCard 
+              key={screen.id}
+              title={screen.title}
+              icon={screen.icon}
+              description={screen.description}
+              criteria={screen.criteria}
+              usersCount={screen.users}
+              onClick={() => {
+                setFilters(screen.filters);
+                applyFilters();
+                document.getElementById("fund-results")?.scrollIntoView({ behavior: "smooth" });
+              }}
+            />
+          ))}
+        </div>
+      </div>
       
-      <div className="mb-4 text-sm text-muted-foreground">
+      {/* Fund Results Section */}
+      <div id="fund-results" className="mb-4 text-sm text-muted-foreground">
         Showing {filteredFunds.length} funds
       </div>
       

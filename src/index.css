@@ -1,11 +1,13 @@
 
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 210 40% 98%;
+    --background: 0 0% 100%;
     --foreground: 222 47% 11%;
 
     --card: 0 0% 100%;
@@ -14,7 +16,7 @@
     --popover: 0 0% 100%;
     --popover-foreground: 222 47% 11%;
 
-    --primary: 222 47% 11%;
+    --primary: 252 56% 57%;
     --primary-foreground: 210 40% 98%;
 
     --secondary: 210 40% 96%;
@@ -23,15 +25,15 @@
     --muted: 210 40% 96%;
     --muted-foreground: 215 16% 47%;
 
-    --accent: 210 40% 96%;
-    --accent-foreground: 222 47% 11%;
+    --accent: 262 83% 96%;
+    --accent-foreground: 252 56% 57%;
 
     --destructive: 0 84% 60%;
     --destructive-foreground: 210 40% 98%;
 
     --border: 214 32% 91%;
     --input: 214 32% 91%;
-    --ring: 222 84% 5%;
+    --ring: 252 56% 57%;
 
     --radius: 0.5rem;
 
@@ -74,5 +76,39 @@
   
   .value-negative {
     @apply bg-red-100 text-loss;
+  }
+
+  /* Modern hover effects for cards */
+  .hover-card-effect {
+    @apply transition-all duration-300 hover:shadow-lg hover:translate-y-[-4px];
+  }
+
+  /* Google NotebookLM inspired styles */
+  .notebook-container {
+    @apply max-w-5xl mx-auto p-6;
+  }
+
+  .glass-card {
+    @apply bg-white/80 backdrop-blur-sm border border-white/20 rounded-xl shadow-sm;
+  }
+  
+  .card-header {
+    @apply px-6 py-4 border-b border-gray-100;
+  }
+
+  .card-body {
+    @apply p-6;
+  }
+
+  .search-container {
+    @apply relative flex items-center;
+  }
+
+  .search-input {
+    @apply w-full pl-10 pr-4 py-2 rounded-full border border-gray-200 focus:border-purple-300 focus:outline-none focus:ring-2 focus:ring-purple-100 transition-all;
+  }
+
+  .search-icon {
+    @apply absolute left-3 text-gray-400;
   }
 }

@@ -19,6 +19,10 @@ export default {
 			}
 		},
 		extend: {
+			fontFamily: {
+				sans: ['Inter', 'system-ui', 'sans-serif'],
+				mono: ['JetBrains Mono', 'monospace'],
+			},
 			colors: {
 				border: 'hsl(var(--border))',
 				input: 'hsl(var(--input))',
@@ -69,6 +73,31 @@ export default {
 				neutral: '#718096', // Neutral gray
 				chartBlue: '#0EA5E9', // Bright blue for charts
 				chartPurple: '#8B5CF6', // Purple for charts
+				// Modern Google NotebookLM style colors
+				purple: {
+					50: '#F6F4FD',
+					100: '#E8E2FC',
+					200: '#D1C5F9',
+					300: '#B9A8F7',
+					400: '#A18BF4',
+					500: '#896EF1',
+					600: '#7E58EF',
+					700: '#6D35EC',
+					800: '#5A19D9',
+					900: '#4813B3',
+				},
+				cool: {
+					50: '#F5F7FA',
+					100: '#E4E7EB',
+					200: '#CBD2D9',
+					300: '#9AA5B1',
+					400: '#7B8794',
+					500: '#616E7C',
+					600: '#52606D',
+					700: '#3E4C59',
+					800: '#323F4B',
+					900: '#1F2933',
+				},
 			},
 			borderRadius: {
 				lg: 'var(--radius)',
