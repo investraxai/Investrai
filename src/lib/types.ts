@@ -46,4 +46,5 @@ export interface FundFilters {
   maxAUM?: number;
   aumCategory?: 'Small' | 'Mid' | 'Large';
   searchQuery?: string;
+  fundIds?: string; // Added this property to support fetching funds by IDs
 }

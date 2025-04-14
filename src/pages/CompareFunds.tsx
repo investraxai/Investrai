@@ -1,3 +1,4 @@
+
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout";
 import { FundData } from "@/lib/types";
@@ -5,7 +6,6 @@ import { fetchFunds } from "@/lib/api";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { Link } from "react-router-dom";
 import { ComparisonTable } from "@/components/comparison-table";
 
 const CompareFunds = () => {
