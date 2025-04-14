@@ -1,158 +1,104 @@
-
-import { useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { AlertCircle, Info, PlusCircle } from "lucide-react";
-import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { FundSelector, FundSelectedBadge } from "@/components/fund-selector";
-import { ComparisonTable } from "@/components/comparison-table";
-import { ComparisonChart } from "@/components/comparison-chart";
-import { FundPerformance3D } from "@/components/visualizations/FundPerformance3D";
+import { useState, useEffect } from "react";
+import { Layout } from "@/components/layout";
 import { FundData } from "@/lib/types";
 import { fetchFunds } from "@/lib/api";
-import { toast } from "@/components/ui/use-toast";
+import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Input } from "@/components/ui/input";
+import { Button } from "@/components/ui/button";
+import { Link } from "react-router-dom";
+import { ComparisonTable } from "@/components/comparison-table";
 
-export default function CompareFunds() {
-  const [selectedFunds, setSelectedFunds] = useState<FundData[]>([]);
+const CompareFunds = () => {
+  const [fundIds, setFundIds] = useState<string[]>([]);
+  const [funds, setFunds] = useState<FundData[]>([]);
+  const [newFundId, setNewFundId] = useState("");
+  const [error, setError] = useState<string | null>(null);
 
-  // Fetch funds data
-  const { data: funds, isLoading, error } = useQuery({
-    queryKey: ["funds"],
-    queryFn: async () => {
+  useEffect(() => {
+    const fetchComparedFunds = async () => {
       try {
-        // Use the API service to fetch funds
-        return await fetchFunds();
-      } catch (error) {
-        toast({
-          title: "Error fetching funds",
-          description: error instanceof Error ? error.message : "An unknown error occurred",
-          variant: "destructive",
-        });
-        throw error;
+        if (fundIds.length > 0) {
+          const fundsData = await fetchFunds({ fundIds: fundIds.join(",") });
+          setFunds(fundsData);
+        } else {
+          setFunds([]);
+        }
+      } catch (err) {
+        setError("Failed to fetch funds for comparison.");
+        console.error(err);
       }
-    },
-  });
+    };
 
-  const handleSelectFund = (fund: FundData) => {
-    if (selectedFunds.length >= 4) {
-      toast({
-        title: "Maximum funds reached",
-        description: "You can compare up to 4 funds at once",
-        variant: "warning",
-      });
-      return;
+    fetchComparedFunds();
+  }, [fundIds]);
+
+  const addFundId = () => {
+    if (newFundId && !fundIds.includes(newFundId)) {
+      setFundIds([...fundIds, newFundId]);
+      setNewFundId("");
+      setError(null);
+    } else if (fundIds.includes(newFundId)) {
+      setError("Fund ID already added.");
+    } else {
+      setError("Please enter a Fund ID.");
     }
-    
-    // Check if fund is already selected
-    if (selectedFunds.some((f) => f.id === fund.id)) {
-      return;
-    }
-    
-    setSelectedFunds([...selectedFunds, fund]);
   };
 
-  const handleRemoveFund = (fundId: string) => {
-    setSelectedFunds(selectedFunds.filter((fund) => fund.id !== fundId));
+  const removeFundId = (id: string) => {
+    setFundIds(fundIds.filter((fundId) => fundId !== id));
+    setError(null);
   };
-
-  // Create a buttonLabel as React element
-  const addFundButtonLabel = (
-    <div className="flex items-center gap-2 text-muted-foreground">
-      <PlusCircle className="h-4 w-4" />
-      <span>Add Fund to Compare</span>
-    </div>
-  );
+  
+  const clearAllFunds = () => {
+    setFundIds([]);
+    setFunds([]);
+  };
 
   return (
-    <div className="container py-6 md:py-8">
-      <div className="mb-6">
-        <h1 className="mb-2 text-3xl font-bold tracking-tight">Compare Mutual Funds</h1>
-        <p className="text-muted-foreground">
-          Compare key metrics and performance data for mutual funds side by side
-        </p>
-      </div>
+    <Layout>
+      <div className="container space-y-8 px-4 py-8 md:px-6">
+        {funds.length === 0 ? (
+          <Alert variant="default">
+            <AlertDescription>
+              Add fund IDs to compare. You can find the Fund ID on the fund details page.
+            </AlertDescription>
+          </Alert>
+        ) : null}
 
-      {/* Fund Selection Section */}
-      <div className="mb-6 space-y-4">
-        <div className="flex items-center justify-between">
-          <h2 className="text-xl font-semibold">Selected Funds</h2>
-          {selectedFunds.length > 0 && (
-            <Button 
-              variant="outline" 
-              size="sm" 
-              onClick={() => setSelectedFunds([])}
-            >
+        <div className="flex flex-col space-y-4 md:flex-row md:items-center md:space-x-4 md:space-y-0">
+          <Input
+            type="text"
+            placeholder="Enter Fund ID"
+            value={newFundId}
+            onChange={(e) => setNewFundId(e.target.value)}
+          />
+          <Button onClick={addFundId}>Add Fund</Button>
+          {funds.length > 0 && (
+            <Button variant="destructive" onClick={clearAllFunds}>
               Clear All
             </Button>
           )}
         </div>
 
-        <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          {selectedFunds.map((fund) => (
-            <FundSelectedBadge
-              key={fund.id}
-              fund={fund}
-              onRemove={() => handleRemoveFund(fund.id)}
-            />
-          ))}
+        {error && <p className="text-red-500">{error}</p>}
 
-          {selectedFunds.length < 4 && (
-            <div className="flex items-center justify-center">
-              {isLoading ? (
-                <div className="text-center text-sm text-muted-foreground">Loading funds...</div>
-              ) : (
-                <FundSelector
-                  funds={funds || []}
-                  onSelect={handleSelectFund}
-                  buttonLabel={addFundButtonLabel}
-                />
-              )}
-            </div>
-          )}
-        </div>
+        {funds.length > 0 && (
+          <div className="overflow-x-auto">
+            <ComparisonTable funds={funds} />
+          </div>
+        )}
 
-        {error && (
-          <Alert variant="destructive">
-            <AlertCircle className="h-4 w-4" />
-            <AlertTitle>Error</AlertTitle>
-            <AlertDescription>
-              Failed to load funds. Please try again later.
-            </AlertDescription>
-          </Alert>
+        {funds.length > 0 && (
+          <div className="mt-6">
+            <p>
+              <strong>Disclaimer:</strong> The comparison is based on the data
+              available and for informational purposes only.
+            </p>
+          </div>
         )}
       </div>
-
-      {selectedFunds.length === 0 ? (
-        <div className="mt-12 text-center">
-          <div className="rounded-full bg-muted p-4 inline-flex">
-            <Info className="h-8 w-8 text-muted-foreground" />
-          </div>
-          <h3 className="mt-4 text-lg font-medium">No funds selected</h3>
-          <p className="mt-2 text-muted-foreground">
-            Select funds above to start comparing their performance and metrics
-          </p>
-        </div>
-      ) : (
-        <div className="space-y-6">
-          <Tabs defaultValue="table" className="w-full">
-            <TabsList>
-              <TabsTrigger value="table">Table View</TabsTrigger>
-              <TabsTrigger value="chart">Performance Chart</TabsTrigger>
-              <TabsTrigger value="3d">3D Visualization</TabsTrigger>
-            </TabsList>
-            <TabsContent value="table" className="mt-6">
-              <ComparisonTable funds={selectedFunds} />
-            </TabsContent>
-            <TabsContent value="chart" className="mt-6">
-              <ComparisonChart funds={selectedFunds} />
-            </TabsContent>
-            <TabsContent value="3d" className="mt-6">
-              <FundPerformance3D funds={selectedFunds} />
-            </TabsContent>
-          </Tabs>
-        </div>
-      )}
-    </div>
+    </Layout>
   );
-}
+};
+
+export default CompareFunds;

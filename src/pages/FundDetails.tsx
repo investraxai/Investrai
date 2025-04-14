@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import { Layout } from "@/components/layout";
@@ -6,6 +5,7 @@ import { ChartNavHistory } from "@/components/chart-nav-history";
 import { SIPCalculator } from "@/components/sip-calculator";
 import { getFundById } from "@/lib/mock-data";
 import { FundData } from "@/lib/types";
+import { MicroLessonTooltip } from "@/components/ui/micro-lesson-tooltip";
 import {
   Card,
   CardContent,
@@ -100,12 +100,15 @@ const FundDetails = () => {
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">₹{fund.nav.toFixed(4)}</div>
+                <div className="text-sm text-muted-foreground">Net Asset Value per unit</div>
               </CardContent>
             </Card>
             
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Fund AUM</CardTitle>
+                <MicroLessonTooltip lesson="Total value of all investments managed by the fund">
+                  <CardTitle className="text-base">Fund AUM</CardTitle>
+                </MicroLessonTooltip>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">
@@ -117,7 +120,9 @@ const FundDetails = () => {
             
             <Card>
               <CardHeader className="pb-2">
-                <CardTitle className="text-base">Expense Ratio</CardTitle>
+                <MicroLessonTooltip lesson="Annual fee charged by the fund for managing your investments">
+                  <CardTitle className="text-base">Expense Ratio</CardTitle>
+                </MicroLessonTooltip>
               </CardHeader>
               <CardContent>
                 <div className="text-2xl font-bold">{fund.expense_ratio}%</div>

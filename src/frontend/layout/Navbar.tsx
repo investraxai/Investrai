@@ -15,20 +15,24 @@ export function Navbar() {
       <div className="container flex h-16 items-center justify-between px-4 md:px-6">
         <div className="flex items-center gap-4">
           <Link to="/" className="flex items-center">
-            <span className="text-xl font-bold text-primary">Investra</span>
-            <span className="ml-1 text-xs text-muted-foreground">BETA</span>
+            <span className="text-2xl font-bold text-primary tracking-tight hover:text-primary/90 transition-colors">
+              Investra
+            </span>
+            <span className="ml-1.5 px-1.5 py-0.5 text-xs font-medium bg-primary/10 text-primary rounded-md">
+              BETA
+            </span>
           </Link>
         </div>
 
         {/* Desktop Navigation Links */}
-        <div className="hidden md:flex md:items-center md:gap-6">
-          <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-primary">
+        <div className="hidden md:flex md:items-center md:gap-8">
+          <Link to="/" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
             Home
           </Link>
-          <Link to="/screener" className="text-sm font-medium text-muted-foreground hover:text-primary">
+          <Link to="/screener" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
             Screener
           </Link>
-          <Link to="/compare" className="text-sm font-medium text-muted-foreground hover:text-primary">
+          <Link to="/compare" className="text-sm font-medium text-muted-foreground hover:text-primary transition-colors">
             Compare Funds
           </Link>
         </div>
