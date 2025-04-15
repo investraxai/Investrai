@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Layout } from "@/components/layout";
 import { FundData } from "@/lib/types";
@@ -32,7 +31,7 @@ const CompareFunds = () => {
             toast({
               title: "Some funds not found",
               description: "Not all fund IDs were found in the database.",
-              variant: "warning",
+              variant: "destructive",
             });
           }
         } else {
@@ -64,14 +63,14 @@ const CompareFunds = () => {
       toast({
         title: "Duplicate Fund",
         description: "This fund ID has already been added to the comparison.",
-        variant: "warning",
+        variant: "destructive",
       });
     } else {
       setError("Please enter a Fund ID.");
       toast({
         title: "Invalid Input",
         description: "Please enter a valid Fund ID.",
-        variant: "warning",
+        variant: "destructive",
       });
     }
   };
