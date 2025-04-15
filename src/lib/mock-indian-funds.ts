@@ -1,5 +1,5 @@
 
-import { FundData } from "./types";
+import { FundData, FundFilters, FundCategory } from "./types";
 
 // Mock data for 50 Indian mutual funds
 export const indianMutualFunds: FundData[] = [
