@@ -28,6 +28,28 @@ export interface FundData {
   min_sip_amount?: number;
   min_lumpsum?: number;
   exit_load?: string;
+  
+  // Advanced metrics
+  standard_deviation?: number;
+  sharpe_ratio?: number;
+  treynor_ratio?: number;
+  beta?: number;
+  alpha?: number;
+  cagr?: number;
+  max_drawdown?: number;
+  amc_profile?: {
+    description?: string;
+    total_aum?: number;
+    total_schemes?: number;
+  };
+  fund_manager_details?: {
+    name?: string;
+    qualification?: string;
+    experience?: number;
+    aum_managed?: number;
+    bio?: string;
+    image_url?: string;
+  };
 }
 
 export interface FundFilters {
@@ -46,4 +68,16 @@ export interface FundFilters {
   aumCategory?: 'Small' | 'Mid' | 'Large';
   searchQuery?: string;
   fundIds?: string;
+  
+  // Advanced filters
+  minStandardDeviation?: number;
+  maxStandardDeviation?: number;
+  minSharpeRatio?: number; 
+  maxSharpeRatio?: number;
+  minTreynorRatio?: number;
+  maxTreynorRatio?: number;
+  minBeta?: number;
+  maxBeta?: number;
+  minAlpha?: number;
+  maxAlpha?: number;
 }

@@ -36,6 +36,39 @@ class FundViewSet(viewsets.ReadOnlyModelViewSet):
                 Q(amc__icontains=search_query)
             )
             
+        # Apply advanced metric filters
+        min_standard_deviation = self.request.query_params.get('minStandardDeviation')
+        max_standard_deviation = self.request.query_params.get('maxStandardDeviation')
+        min_sharpe_ratio = self.request.query_params.get('minSharpeRatio')
+        max_sharpe_ratio = self.request.query_params.get('maxSharpeRatio')
+        min_treynor_ratio = self.request.query_params.get('minTreynorRatio')
+        max_treynor_ratio = self.request.query_params.get('maxTreynorRatio')
+        min_beta = self.request.query_params.get('minBeta')
+        max_beta = self.request.query_params.get('maxBeta')
+        min_alpha = self.request.query_params.get('minAlpha')
+        max_alpha = self.request.query_params.get('maxAlpha')
+        
+        if min_standard_deviation:
+            queryset = queryset.filter(standard_deviation__gte=float(min_standard_deviation))
+        if max_standard_deviation:
+            queryset = queryset.filter(standard_deviation__lte=float(max_standard_deviation))
+        if min_sharpe_ratio:
+            queryset = queryset.filter(sharpe_ratio__gte=float(min_sharpe_ratio))
+        if max_sharpe_ratio:
+            queryset = queryset.filter(sharpe_ratio__lte=float(max_sharpe_ratio))
+        if min_treynor_ratio:
+            queryset = queryset.filter(treynor_ratio__gte=float(min_treynor_ratio))
+        if max_treynor_ratio:
+            queryset = queryset.filter(treynor_ratio__lte=float(max_treynor_ratio))
+        if min_beta:
+            queryset = queryset.filter(beta__gte=float(min_beta))
+        if max_beta:
+            queryset = queryset.filter(beta__lte=float(max_beta))
+        if min_alpha:
+            queryset = queryset.filter(alpha__gte=float(min_alpha))
+        if max_alpha:
+            queryset = queryset.filter(alpha__lte=float(max_alpha))
+            
         return queryset
 
 class DataProviderViewSet(viewsets.ModelViewSet):
@@ -68,3 +101,29 @@ def get_all_amcs(request):
     """Get list of all AMCs"""
     amcs = Fund.objects.values_list('amc', flat=True).distinct().order_by('amc')
     return Response(list(amcs))
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def get_advanced_metrics_stats(request):
+    """Get min, max and average values for advanced metrics"""
+    from django.db.models import Min, Max, Avg
+    
+    stats = Fund.objects.aggregate(
+        min_standard_deviation=Min('standard_deviation'),
+        max_standard_deviation=Max('standard_deviation'),
+        avg_standard_deviation=Avg('standard_deviation'),
+        min_sharpe_ratio=Min('sharpe_ratio'),
+        max_sharpe_ratio=Max('sharpe_ratio'),
+        avg_sharpe_ratio=Avg('sharpe_ratio'),
+        min_treynor_ratio=Min('treynor_ratio'),
+        max_treynor_ratio=Max('treynor_ratio'),
+        avg_treynor_ratio=Avg('treynor_ratio'),
+        min_beta=Min('beta'),
+        max_beta=Max('beta'),
+        avg_beta=Avg('beta'),
+        min_alpha=Min('alpha'),
+        max_alpha=Max('alpha'),
+        avg_alpha=Avg('alpha')
+    )
+    
+    return Response(stats)
