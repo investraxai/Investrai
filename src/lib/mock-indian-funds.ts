@@ -1,4 +1,3 @@
-
 import { FundData, FundFilters, FundCategory } from "./types";
 
 // Mock data for 50 Indian mutual funds
@@ -1152,6 +1151,96 @@ export const indianMutualFunds: FundData[] = [
     min_sip_amount: 500,
     min_lumpsum: 5000,
     exit_load: "1% if redeemed within 1 year"
+  },
+  {
+    id: "MIRAE004",
+    scheme_name: "Mirae Asset Emerging Bluechip Fund",
+    amc: "Mirae Asset",
+    scheme_code: "MIRAE004",
+    nav: 98.76,
+    category: "Equity",
+    sub_category: "Large & Mid Cap",
+    expense_ratio: 1.68,
+    aum: 24567.89,
+    aum_category: "Large",
+    returns: {
+      "1Y": 22.43,
+      "3Y": 19.87,
+      "5Y": 16.54
+    },
+    risk_rating: 4,
+    inception_date: "2010-07-09",
+    fund_manager: "Neelesh Surana",
+    min_sip_amount: 500,
+    min_lumpsum: 5000,
+    exit_load: "1% if redeemed within 1 year",
+    standard_deviation: 18.76,
+    sharpe_ratio: 0.98,
+    treynor_ratio: 0.76,
+    beta: 1.12,
+    alpha: 3.21,
+    cagr: 16.87,
+    max_drawdown: 25.43
+  },
+  {
+    id: "FRANKLIN001",
+    scheme_name: "Franklin India Ultra Short Bond Fund",
+    amc: "Franklin Templeton",
+    scheme_code: "FRANKLIN001",
+    nav: 32.54,
+    category: "Debt",
+    sub_category: "Ultra Short Duration",
+    expense_ratio: 0.45,
+    aum: 8765.43,
+    aum_category: "Mid",
+    returns: {
+      "1Y": 6.87,
+      "3Y": 7.21,
+      "5Y": 7.65
+    },
+    risk_rating: 2,
+    inception_date: "2003-12-18",
+    fund_manager: "Santosh Kamath",
+    min_sip_amount: 500,
+    min_lumpsum: 5000,
+    exit_load: "Nil",
+    standard_deviation: 2.43,
+    sharpe_ratio: 1.21,
+    treynor_ratio: 0.45,
+    beta: 0.32,
+    alpha: 1.23,
+    cagr: 7.32,
+    max_drawdown: 3.21
+  },
+  {
+    id: "QUANT001",
+    scheme_name: "Quant Small Cap Fund",
+    amc: "Quant Mutual Fund",
+    scheme_code: "QUANT001",
+    nav: 145.32,
+    category: "Equity",
+    sub_category: "Small Cap",
+    expense_ratio: 2.12,
+    aum: 4567.89,
+    aum_category: "Small",
+    returns: {
+      "1Y": 32.54,
+      "3Y": 28.76,
+      "5Y": 22.43
+    },
+    risk_rating: 5,
+    inception_date: "2013-01-07",
+    fund_manager: "Sandeep Tandon",
+    min_sip_amount: 500,
+    min_lumpsum: 5000,
+    exit_load: "1% if redeemed within 1 year",
+    standard_deviation: 24.87,
+    sharpe_ratio: 1.45,
+    treynor_ratio: 0.98,
+    beta: 1.32,
+    alpha: 8.76,
+    cagr: 25.43,
+    max_drawdown: 35.67
   }
 ];
 

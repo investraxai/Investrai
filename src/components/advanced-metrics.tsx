@@ -1,4 +1,3 @@
-
 import React from 'react';
 import { FundData } from '@/lib/types';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from './ui/card';
@@ -32,7 +31,9 @@ export function AdvancedMetrics({ fund }: AdvancedMetricsProps) {
           <div className="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
             {/* Standard Deviation */}
             <div className="rounded-lg border p-4">
-              <MicroLessonTooltip lesson="Standard deviation measures the fund's volatility of returns. Higher values indicate more volatility and potentially more risk.">
+              <MicroLessonTooltip
+                lesson="Standard deviation measures the fund's volatility of returns. Higher values indicate more volatility and potentially more risk."
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium">Standard Deviation</h3>
                   <Info className="h-4 w-4 text-muted-foreground" />
@@ -43,14 +44,16 @@ export function AdvancedMetrics({ fund }: AdvancedMetricsProps) {
                 {parseFloat(standardDeviation as string) > 15
                   ? "High volatility"
                   : parseFloat(standardDeviation as string) > 10
-                  ? "Moderate volatility"
-                  : "Low volatility"}
+                    ? "Moderate volatility"
+                    : "Low volatility"}
               </p>
             </div>
 
             {/* Sharpe Ratio */}
             <div className="rounded-lg border p-4">
-              <MicroLessonTooltip lesson="Sharpe ratio measures the performance of the fund compared to a risk-free asset, after adjusting for risk. Higher values indicate better risk-adjusted returns.">
+              <MicroLessonTooltip
+                lesson="Sharpe ratio measures the performance of the fund compared to a risk-free asset, after adjusting for risk. Higher values indicate better risk-adjusted returns."
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium">Sharpe Ratio</h3>
                   <Info className="h-4 w-4 text-muted-foreground" />
@@ -61,14 +64,16 @@ export function AdvancedMetrics({ fund }: AdvancedMetricsProps) {
                 {parseFloat(sharpeRatio as string) > 1
                   ? "Good risk-adjusted returns"
                   : parseFloat(sharpeRatio as string) > 0.5
-                  ? "Average risk-adjusted returns"
-                  : "Poor risk-adjusted returns"}
+                    ? "Average risk-adjusted returns"
+                    : "Poor risk-adjusted returns"}
               </p>
             </div>
 
             {/* Treynor Ratio */}
             <div className="rounded-lg border p-4">
-              <MicroLessonTooltip lesson="Treynor ratio measures returns earned in excess of a risk-free rate per unit of market risk. Higher values indicate better returns for the risk taken.">
+              <MicroLessonTooltip
+                lesson="Treynor ratio measures returns earned in excess of a risk-free rate per unit of market risk. Higher values indicate better returns for the risk taken."
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium">Treynor Ratio</h3>
                   <Info className="h-4 w-4 text-muted-foreground" />
@@ -79,14 +84,16 @@ export function AdvancedMetrics({ fund }: AdvancedMetricsProps) {
                 {parseFloat(treynorRatio as string) > 0.8
                   ? "Excellent market risk efficiency"
                   : parseFloat(treynorRatio as string) > 0.4
-                  ? "Good market risk efficiency"
-                  : "Average market risk efficiency"}
+                    ? "Good market risk efficiency"
+                    : "Average market risk efficiency"}
               </p>
             </div>
 
             {/* Beta */}
             <div className="rounded-lg border p-4">
-              <MicroLessonTooltip lesson="Beta measures a fund's volatility compared to the market. Beta of 1 means the fund moves with the market, >1 means more volatile than market, <1 means less volatile.">
+              <MicroLessonTooltip
+                lesson="Beta measures a fund's volatility compared to the market. Beta of 1 means the fund moves with the market, >1 means more volatile than market, <1 means less volatile."
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium">Beta</h3>
                   <Info className="h-4 w-4 text-muted-foreground" />
@@ -97,14 +104,16 @@ export function AdvancedMetrics({ fund }: AdvancedMetricsProps) {
                 {parseFloat(beta as string) > 1.2
                   ? "More volatile than market"
                   : parseFloat(beta as string) > 0.8
-                  ? "Similar to market"
-                  : "Less volatile than market"}
+                    ? "Similar to market"
+                    : "Less volatile than market"}
               </p>
             </div>
 
             {/* Alpha */}
             <div className="rounded-lg border p-4">
-              <MicroLessonTooltip lesson="Alpha shows how much a fund outperforms or underperforms relative to its benchmark. Positive alpha means the fund outperformed its benchmark.">
+              <MicroLessonTooltip
+                lesson="Alpha shows how much a fund outperforms or underperforms relative to its benchmark. Positive alpha means the fund outperformed its benchmark."
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium">Alpha</h3>
                   <Info className="h-4 w-4 text-muted-foreground" />
@@ -117,14 +126,16 @@ export function AdvancedMetrics({ fund }: AdvancedMetricsProps) {
                 {parseFloat(alpha as string) > 2
                   ? "Excellent outperformance"
                   : parseFloat(alpha as string) > 0
-                  ? "Outperforms benchmark"
-                  : "Underperforms benchmark"}
+                    ? "Outperforms benchmark"
+                    : "Underperforms benchmark"}
               </p>
             </div>
 
             {/* Max Drawdown */}
             <div className="rounded-lg border p-4">
-              <MicroLessonTooltip lesson="Maximum drawdown measures the largest peak-to-trough decline in the fund's value. Lower values indicate less severe losses during downturns.">
+              <MicroLessonTooltip
+                lesson="Maximum drawdown measures the largest peak-to-trough decline in the fund's value. Lower values indicate less severe losses during downturns."
+              >
                 <div className="flex items-center justify-between">
                   <h3 className="font-medium">Max Drawdown</h3>
                   <Info className="h-4 w-4 text-muted-foreground" />
@@ -135,8 +146,8 @@ export function AdvancedMetrics({ fund }: AdvancedMetricsProps) {
                 {parseFloat(maxDrawdown as string) > 25
                   ? "High downside risk"
                   : parseFloat(maxDrawdown as string) > 15
-                  ? "Moderate downside risk"
-                  : "Low downside risk"}
+                    ? "Moderate downside risk"
+                    : "Low downside risk"}
               </p>
             </div>
           </div>
