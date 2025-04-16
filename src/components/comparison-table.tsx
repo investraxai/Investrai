@@ -1,15 +1,8 @@
 
 import { FundData } from "@/lib/types";
-import { ArrowUp, ArrowDown, Star, Info } from "lucide-react";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
-
-const riskLabels: Record<number, string> = {
-  1: "Very Low",
-  2: "Low",
-  3: "Moderate",
-  4: "High",
-  5: "Very High",
-};
+import { MetricsRow } from "./comparison/MetricsRow";
+import { TooltipLabel } from "./comparison/TooltipLabel";
+import { RiskRating } from "./comparison/RiskRating";
 
 interface ComparisonTableProps {
   funds: FundData[];
@@ -47,59 +40,9 @@ export function ComparisonTable({ funds }: ComparisonTableProps) {
             ))}
           </tr>
 
-          {/* 1Y Return */}
-          <tr className="hover:bg-muted/50">
-            <td className="py-3 pl-4 font-medium">1Y Return</td>
-            {funds.map((fund) => (
-              <td key={fund.id} className="p-3">
-                <span className={fund.returns["1Y"] >= 0 ? "gain-text" : "loss-text"}>
-                  {fund.returns["1Y"] >= 0 ? "+" : ""}
-                  {fund.returns["1Y"].toFixed(2)}%
-                  {fund.returns["1Y"] >= 0 ? (
-                    <ArrowUp className="ml-1 inline h-4 w-4" />
-                  ) : (
-                    <ArrowDown className="ml-1 inline h-4 w-4" />
-                  )}
-                </span>
-              </td>
-            ))}
-          </tr>
-
-          {/* 3Y Return */}
-          <tr className="hover:bg-muted/50">
-            <td className="py-3 pl-4 font-medium">3Y Return</td>
-            {funds.map((fund) => (
-              <td key={fund.id} className="p-3">
-                <span className={fund.returns["3Y"] >= 0 ? "gain-text" : "loss-text"}>
-                  {fund.returns["3Y"] >= 0 ? "+" : ""}
-                  {fund.returns["3Y"].toFixed(2)}%
-                  {fund.returns["3Y"] >= 0 ? (
-                    <ArrowUp className="ml-1 inline h-4 w-4" />
-                  ) : (
-                    <ArrowDown className="ml-1 inline h-4 w-4" />
-                  )}
-                </span>
-              </td>
-            ))}
-          </tr>
-
-          {/* 5Y Return */}
-          <tr className="hover:bg-muted/50">
-            <td className="py-3 pl-4 font-medium">5Y Return</td>
-            {funds.map((fund) => (
-              <td key={fund.id} className="p-3">
-                <span className={fund.returns["5Y"] >= 0 ? "gain-text" : "loss-text"}>
-                  {fund.returns["5Y"] >= 0 ? "+" : ""}
-                  {fund.returns["5Y"].toFixed(2)}%
-                  {fund.returns["5Y"] >= 0 ? (
-                    <ArrowUp className="ml-1 inline h-4 w-4" />
-                  ) : (
-                    <ArrowDown className="ml-1 inline h-4 w-4" />
-                  )}
-                </span>
-              </td>
-            ))}
-          </tr>
+          <MetricsRow label="1Y Return" metric="1Y" funds={funds} />
+          <MetricsRow label="3Y Return" metric="3Y" funds={funds} />
+          <MetricsRow label="5Y Return" metric="5Y" funds={funds} />
 
           {/* NAV */}
           <tr className="hover:bg-muted/50">
@@ -114,21 +57,10 @@ export function ComparisonTable({ funds }: ComparisonTableProps) {
           {/* Expense Ratio */}
           <tr className="hover:bg-muted/50">
             <td className="py-3 pl-4 font-medium">
-              <div className="flex items-center">
-                Expense Ratio
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="ml-1 h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs text-sm">
-                        The percentage of assets deducted each year for expenses
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+              <TooltipLabel 
+                label="Expense Ratio"
+                tooltip="The percentage of assets deducted each year for expenses"
+              />
             </td>
             {funds.map((fund) => (
               <td key={fund.id} className="p-3">
@@ -140,19 +72,10 @@ export function ComparisonTable({ funds }: ComparisonTableProps) {
           {/* AUM */}
           <tr className="hover:bg-muted/50">
             <td className="py-3 pl-4 font-medium">
-              <div className="flex items-center">
-                AUM
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="ml-1 h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs text-sm">Assets Under Management in crores</p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+              <TooltipLabel 
+                label="AUM"
+                tooltip="Assets Under Management in crores"
+              />
             </td>
             {funds.map((fund) => (
               <td key={fund.id} className="p-3">
@@ -167,25 +90,12 @@ export function ComparisonTable({ funds }: ComparisonTableProps) {
             <td className="py-3 pl-4 font-medium">Risk Level</td>
             {funds.map((fund) => (
               <td key={fund.id} className="p-3">
-                <div className="flex items-center">
-                  <div className="flex">
-                    {[1, 2, 3, 4, 5].map((level) => (
-                      <Star
-                        key={level}
-                        className={`h-4 w-4 ${
-                          level <= fund.risk_rating
-                            ? "fill-yellow-400 text-yellow-400"
-                            : "text-gray-300"
-                        }`}
-                      />
-                    ))}
-                  </div>
-                  <span className="ml-2 text-sm">{riskLabels[fund.risk_rating]}</span>
-                </div>
+                <RiskRating rating={fund.risk_rating} />
               </td>
             ))}
           </tr>
 
+          {/* Remaining rows */}
           {/* Fund Manager */}
           <tr className="hover:bg-muted/50">
             <td className="py-3 pl-4 font-medium">Fund Manager</td>
@@ -233,21 +143,10 @@ export function ComparisonTable({ funds }: ComparisonTableProps) {
           {/* Exit Load */}
           <tr className="hover:bg-muted/50">
             <td className="py-3 pl-4 font-medium">
-              <div className="flex items-center">
-                Exit Load
-                <TooltipProvider>
-                  <Tooltip>
-                    <TooltipTrigger asChild>
-                      <Info className="ml-1 h-4 w-4 text-muted-foreground" />
-                    </TooltipTrigger>
-                    <TooltipContent>
-                      <p className="max-w-xs text-sm">
-                        Fee charged when redeeming units before a specified period
-                      </p>
-                    </TooltipContent>
-                  </Tooltip>
-                </TooltipProvider>
-              </div>
+              <TooltipLabel 
+                label="Exit Load"
+                tooltip="Fee charged when redeeming units before a specified period"
+              />
             </td>
             {funds.map((fund) => (
               <td key={fund.id} className="p-3">
