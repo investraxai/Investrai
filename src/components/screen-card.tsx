@@ -2,25 +2,28 @@
 import { Card, CardContent } from "@/components/ui/card";
 import { HoverCard, HoverCardContent, HoverCardTrigger } from "@/components/ui/hover-card";
 import { ArrowRight, Users } from "lucide-react";
+import { FundFilters } from "@/lib/types";
 
 interface ScreenCardProps {
   title: string;
-  icon: string;
+  icon?: string;
   description: string;
   criteria?: string[];
   usersCount?: string;
-  onClick: () => void;
+  onClick?: () => void;
   isPro?: boolean;
+  filter?: FundFilters;
 }
 
 export function ScreenCard({
   title,
-  icon,
+  icon = "📊",
   description,
   criteria = [],
   usersCount = "0",
-  onClick,
-  isPro = false
+  onClick = () => {},
+  isPro = false,
+  filter = {}
 }: ScreenCardProps) {
   return (
     <Card 

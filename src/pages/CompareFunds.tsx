@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+
+import React, { useState, useEffect } from 'react';
 import { FundData } from '@/lib/types';
 import { FundSelector } from '@/components/fund-selector';
 import { ComparisonTable } from '@/components/comparison-table';
@@ -7,9 +8,43 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/com
 import { Button } from '@/components/ui/button';
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
+import { getFundById } from '@/lib/mock-data';
 
 export const CompareFunds: React.FC = () => {
   const [selectedFunds, setSelectedFunds] = useState<FundData[]>([]);
+  const [allFunds, setAllFunds] = useState<FundData[]>([]);
+
+  useEffect(() => {
+    // Fetch all funds
+    const fetchAllFunds = async () => {
+      try {
+        const response = await fetch('/api/funds/');
+        if (response.ok) {
+          const data = await response.json();
+          setAllFunds(data);
+        } else {
+          // Fallback to mock data if API fails
+          setAllFunds(getAllMockFunds());
+        }
+      } catch (error) {
+        console.error("Error fetching funds:", error);
+        // Fallback to mock data
+        setAllFunds(getAllMockFunds());
+      }
+    };
+
+    fetchAllFunds();
+  }, []);
+
+  // Helper function to get all mock funds
+  const getAllMockFunds = (): FundData[] => {
+    const funds: FundData[] = [];
+    for (let i = 1; i <= 50; i++) {
+      const fund = getFundById(`fund-${i}`);
+      if (fund) funds.push(fund);
+    }
+    return funds;
+  };
 
   const addFund = (fund: FundData) => {
     if (selectedFunds.find((f) => f.id === fund.id)) {
@@ -35,7 +70,11 @@ export const CompareFunds: React.FC = () => {
           <CardDescription>Select up to 4 funds to compare.</CardDescription>
         </CardHeader>
         <CardContent>
-          <FundSelector onSelect={addFund} />
+          <FundSelector 
+            funds={allFunds} 
+            onSelect={addFund} 
+            buttonLabel="Select a fund to compare"
+          />
 
           {selectedFunds.length > 0 && (
             <div className="mt-4">

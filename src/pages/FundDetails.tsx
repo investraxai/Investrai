@@ -1,3 +1,4 @@
+
 import React, { useEffect, useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { FundData } from '@/lib/types';
@@ -6,7 +7,7 @@ import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ChartNavHistory } from '@/components/chart-nav-history';
 import { generateHistoricalNAVData, getFundById } from '@/lib/mock-data';
-import { SipCalculator } from '@/components/sip-calculator';
+import { SIPCalculator } from '@/components/sip-calculator';
 import { StatsCard } from '@/components/stats-card';
 import { ArrowLeft, Calendar, DollarSign, PieChart, TrendingUp } from 'lucide-react';
 import { Link } from 'react-router-dom';
@@ -15,9 +16,10 @@ import { AMCProfile } from '@/components/amc-profile';
 import { FundManagerProfile } from '@/components/fund-manager-profile';
 import { FundPerformance3D } from '@/components/visualizations/FundPerformance3D';
 
-interface RouteParams {
+type RouteParams = {
   fundId: string;
-}
+  [key: string]: string | undefined;
+};
 
 export const FundDetails: React.FC = () => {
   const { fundId } = useParams<RouteParams>();
@@ -54,10 +56,10 @@ export const FundDetails: React.FC = () => {
         </CardHeader>
         <CardContent>
           <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-4">
-            <StatsCard title="Category" value={fund.category} icon={PieChart} />
-            <StatsCard title="AMC" value={fund.amc} icon={TrendingUp} />
-            <StatsCard title="Inception Date" value={fund.inception_date} icon={Calendar} />
-            <StatsCard title="NAV" value={fund.nav.toString()} icon={DollarSign} />
+            <StatsCard title="Category" value={fund.category} icon={<PieChart className="h-4 w-4" />} />
+            <StatsCard title="AMC" value={fund.amc} icon={<TrendingUp className="h-4 w-4" />} />
+            <StatsCard title="Inception Date" value={fund.inception_date} icon={<Calendar className="h-4 w-4" />} />
+            <StatsCard title="NAV" value={fund.nav.toString()} icon={<DollarSign className="h-4 w-4" />} />
           </div>
 
           <Tabs defaultValue="performance" className="mt-6">
@@ -76,7 +78,7 @@ export const FundDetails: React.FC = () => {
                   <CardDescription>Historical NAV data for the past year</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <ChartNavHistory navData={navData} />
+                  <ChartNavHistory fund={fund} timeRange="1Y" />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -87,7 +89,7 @@ export const FundDetails: React.FC = () => {
                   <CardDescription>Calculate potential returns on your SIP investments</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <SipCalculator />
+                  <SIPCalculator fund={fund} />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -98,15 +100,7 @@ export const FundDetails: React.FC = () => {
                   <CardDescription>Key metrics for fund analysis</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <AdvancedMetrics 
-                    standardDeviation={fund.standard_deviation}
-                    sharpeRatio={fund.sharpe_ratio}
-                    treynorRatio={fund.treynor_ratio}
-                    beta={fund.beta}
-                    alpha={fund.alpha}
-                    cagr={fund.cagr}
-                    maxDrawdown={fund.max_drawdown}
-                  />
+                  <AdvancedMetrics fund={fund} />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -117,11 +111,7 @@ export const FundDetails: React.FC = () => {
                   <CardDescription>About {fund.amc}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <AMCProfile 
-                    description="HDFC Mutual Fund is one of the leading investment solutions provider in India."
-                    totalAUM={500000}
-                    totalSchemes={200}
-                  />
+                  <AMCProfile fund={fund} />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -132,14 +122,7 @@ export const FundDetails: React.FC = () => {
                   <CardDescription>About {fund.fund_manager}</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <FundManagerProfile 
-                    name={fund.fund_manager}
-                    qualification="MBA, CFA"
-                    experience={15}
-                    aumManaged={25000}
-                    bio="Experienced fund manager with a demonstrated history of working in the financial services industry."
-                    imageUrl="https://via.placeholder.com/150"
-                  />
+                  <FundManagerProfile fund={fund} />
                 </CardContent>
               </Card>
             </TabsContent>
@@ -150,7 +133,7 @@ export const FundDetails: React.FC = () => {
                   <CardDescription>Interactive 3D representation of fund performance</CardDescription>
                 </CardHeader>
                 <CardContent>
-                  <FundPerformance3D returns={fund.returns} />
+                  <FundPerformance3D funds={[fund]} />
                 </CardContent>
               </Card>
             </TabsContent>

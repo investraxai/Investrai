@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import { Card, CardContent, CardHeader, CardTitle, CardDescription } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
@@ -43,16 +42,13 @@ export function SIPCalculator({ fund }: SIPCalculatorProps) {
   const [chartData, setChartData] = useState<any[]>([]);
   const [pieData, setPieData] = useState<any[]>([]);
 
-  // Use the fund's 5Y return for calculations, or fallback to a default
   const expectedReturn = fund.returns["5Y"] || fund.cagr || 12;
 
   useEffect(() => {
     let calculatedResults;
     if (investmentType === "sip") {
-      // Calculate SIP returns
       calculatedResults = calculateSIPReturns(monthlyAmount, years, expectedReturn);
     } else {
-      // Calculate lumpsum returns
       const maturityValue = lumpSumAmount * Math.pow(1 + expectedReturn / 100, years);
       const estimatedReturns = maturityValue - lumpSumAmount;
       
@@ -63,7 +59,6 @@ export function SIPCalculator({ fund }: SIPCalculatorProps) {
       };
     }
     
-    // Calculate tax (assuming 15% tax rate on gains for demonstration)
     const tax = calculatedResults.estimatedReturns * 0.15;
     const postTaxValue = calculatedResults.maturityValue - tax;
     
@@ -73,7 +68,6 @@ export function SIPCalculator({ fund }: SIPCalculatorProps) {
       postTaxValue,
     });
 
-    // Generate chart data for bar chart
     setChartData([
       {
         name: "Investment Breakup",
@@ -83,7 +77,6 @@ export function SIPCalculator({ fund }: SIPCalculatorProps) {
       },
     ]);
     
-    // Generate pie chart data
     setPieData([
       { name: "Amount Invested", value: calculatedResults.totalInvested, color: "#0EA5E9" },
       { name: "Estimated Returns", value: calculatedResults.estimatedReturns, color: "#8B5CF6" },
@@ -91,7 +84,6 @@ export function SIPCalculator({ fund }: SIPCalculatorProps) {
     ]);
   }, [monthlyAmount, lumpSumAmount, years, expectedReturn, investmentType]);
 
-  // Format currency
   const formatCurrency = (value: number) => {
     if (value >= 10000000) {
       return `₹${(value / 10000000).toFixed(2)} Cr`;

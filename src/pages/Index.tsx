@@ -20,7 +20,6 @@ const Index = () => {
   const [allAMCs, setAllAMCs] = useState<string[]>([]);
 
   useEffect(() => {
-    // Fetch funds from the Django backend API
     const fetchFunds = async () => {
       try {
         let url = '/api/funds/';
@@ -47,7 +46,6 @@ const Index = () => {
   }, [categoryFilter, amcFilter, searchQuery]);
 
   useEffect(() => {
-    // Fetch top performing funds from the Django backend API
     const fetchTopFunds = async () => {
       try {
         const response = await fetch('/api/top-funds/');
@@ -65,7 +63,6 @@ const Index = () => {
   }, []);
 
   useEffect(() => {
-    // Fetch all AMCs from the Django backend API
     const fetchAllAMCs = async () => {
       try {
         const response = await fetch('/api/amcs/');
@@ -181,17 +178,29 @@ const Index = () => {
             <ScreenCard
               title="High Sharpe Ratio Funds"
               description="Funds with a Sharpe Ratio > 1.0"
+              icon="📈"
               filter={{ minSharpeRatio: 1.0 }}
+              onClick={() => console.log("High Sharpe Ratio screen clicked")}
+              criteria={["Sharpe Ratio > 1.0", "Risk adjusted returns"]}
+              usersCount="1.2K"
             />
             <ScreenCard
               title="Low Expense Ratio Funds"
               description="Funds with Expense Ratio < 1.0%"
+              icon="💰"
               filter={{ maxExpenseRatio: 1.0 }}
+              onClick={() => console.log("Low Expense Ratio screen clicked")}
+              criteria={["Expense Ratio < 1.0%", "Cost efficient"]}
+              usersCount="984"
             />
             <ScreenCard
               title="High AUM Funds"
               description="Funds with AUM > 10,000 Cr"
+              icon="🏦"
               filter={{ minAUM: 10000 }}
+              onClick={() => console.log("High AUM screen clicked")}
+              criteria={["AUM > 10,000 Cr", "Large funds"]}
+              usersCount="756"
             />
           </div>
         </TabsContent>
