@@ -3,6 +3,10 @@ import { FundData } from "@/lib/types";
 import { MetricsRow } from "./comparison/MetricsRow";
 import { TooltipLabel } from "./comparison/TooltipLabel";
 import { RiskRating } from "./comparison/RiskRating";
+import { CategoryRow } from "./comparison/CategoryRow";
+import { NavRow } from "./comparison/NavRow";
+import { FundManagerRow } from "./comparison/FundManagerRow";
+import { InceptionDateRow } from "./comparison/InceptionDateRow";
 
 interface ComparisonTableProps {
   funds: FundData[];
@@ -25,34 +29,11 @@ export function ComparisonTable({ funds }: ComparisonTableProps) {
           </tr>
         </thead>
         <tbody className="divide-y">
-          {/* Fund Type */}
-          <tr className="border-t hover:bg-muted/50">
-            <td className="py-3 pl-4 font-medium">Category</td>
-            {funds.map((fund) => (
-              <td key={fund.id} className="p-3">
-                <span className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-medium">
-                  {fund.category}
-                </span>
-                {fund.sub_category && (
-                  <span className="ml-2 text-xs text-muted-foreground">{fund.sub_category}</span>
-                )}
-              </td>
-            ))}
-          </tr>
-
+          <CategoryRow funds={funds} />
           <MetricsRow label="1Y Return" metric="1Y" funds={funds} />
           <MetricsRow label="3Y Return" metric="3Y" funds={funds} />
           <MetricsRow label="5Y Return" metric="5Y" funds={funds} />
-
-          {/* NAV */}
-          <tr className="hover:bg-muted/50">
-            <td className="py-3 pl-4 font-medium">NAV</td>
-            {funds.map((fund) => (
-              <td key={fund.id} className="p-3">
-                ₹{fund.nav.toFixed(2)}
-              </td>
-            ))}
-          </tr>
+          <NavRow funds={funds} />
 
           {/* Expense Ratio */}
           <tr className="hover:bg-muted/50">
@@ -95,30 +76,8 @@ export function ComparisonTable({ funds }: ComparisonTableProps) {
             ))}
           </tr>
 
-          {/* Remaining rows */}
-          {/* Fund Manager */}
-          <tr className="hover:bg-muted/50">
-            <td className="py-3 pl-4 font-medium">Fund Manager</td>
-            {funds.map((fund) => (
-              <td key={fund.id} className="p-3">
-                {fund.fund_manager || "Not available"}
-              </td>
-            ))}
-          </tr>
-
-          {/* Inception Date */}
-          <tr className="hover:bg-muted/50">
-            <td className="py-3 pl-4 font-medium">Inception Date</td>
-            {funds.map((fund) => (
-              <td key={fund.id} className="p-3">
-                {new Date(fund.inception_date).toLocaleDateString("en-IN", {
-                  year: "numeric",
-                  month: "short",
-                  day: "numeric",
-                })}
-              </td>
-            ))}
-          </tr>
+          <FundManagerRow funds={funds} />
+          <InceptionDateRow funds={funds} />
 
           {/* Minimum SIP */}
           <tr className="hover:bg-muted/50">
