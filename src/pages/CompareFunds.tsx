@@ -4,8 +4,10 @@ import { FundData } from '@/lib/types';
 import { FundSelector } from '@/components/fund-selector';
 import { ComparisonTable } from '@/components/comparison-table';
 import { ComparisonChart } from '@/components/comparison-chart';
+import { FundOpinions } from '@/components/fund-opinions';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { X } from 'lucide-react';
 import { toast } from 'sonner';
 import { getFundById } from '@/lib/mock-data';
@@ -63,22 +65,21 @@ export const CompareFunds: React.FC = () => {
   };
 
   return (
-    <div className="container mx-auto p-4">
+    <div className="container mx-auto p-4 space-y-6">
       <Card>
         <CardHeader>
           <CardTitle>Compare Mutual Funds</CardTitle>
-          <CardDescription>Select up to 4 funds to compare.</CardDescription>
+          <CardDescription>Select up to 4 funds to compare their performance, returns, and ratings.</CardDescription>
         </CardHeader>
         <CardContent>
           <FundSelector 
             funds={allFunds} 
-            onSelect={addFund} 
-            buttonLabel="Select a fund to compare"
+            onSelect={addFund}
+            buttonLabel="Search and add funds to compare"
           />
 
           {selectedFunds.length > 0 && (
             <div className="mt-4">
-              <h3 className="text-lg font-semibold mb-2">Selected Funds:</h3>
               <div className="flex flex-wrap gap-2">
                 {selectedFunds.map((fund) => (
                   <Button key={fund.id} variant="secondary" onClick={() => removeFund(fund)}>
@@ -88,19 +89,56 @@ export const CompareFunds: React.FC = () => {
               </div>
             </div>
           )}
-
-          {selectedFunds.length >= 2 && (
-            <>
-              <ComparisonTable funds={selectedFunds} />
-              <ComparisonChart funds={selectedFunds} />
-            </>
-          )}
-
-          {selectedFunds.length < 2 && selectedFunds.length > 0 && (
-            <p className="mt-4 text-warning">Select at least two funds to see the comparison.</p>
-          )}
         </CardContent>
       </Card>
+
+      {selectedFunds.length >= 2 && (
+        <Tabs defaultValue="comparison" className="space-y-6">
+          <TabsList>
+            <TabsTrigger value="comparison">Comparison</TabsTrigger>
+            <TabsTrigger value="returns">Returns</TabsTrigger>
+            <TabsTrigger value="opinions">Expert Opinions</TabsTrigger>
+          </TabsList>
+          
+          <TabsContent value="comparison">
+            <ComparisonTable funds={selectedFunds} />
+          </TabsContent>
+          
+          <TabsContent value="returns">
+            <ComparisonChart funds={selectedFunds} />
+          </TabsContent>
+          
+          <TabsContent value="opinions">
+            <FundOpinions 
+              fundName={selectedFunds[0].scheme_name}
+              opinions={[
+                {
+                  title: "Fund Analysis & Detailed Review 2024",
+                  channelName: "Investment Guide",
+                  timeAgo: "2 months ago",
+                  videoUrl: "https://youtube.com/watch?v=example1"
+                },
+                {
+                  title: "Comparison with Peer Funds",
+                  channelName: "Market Insights",
+                  timeAgo: "3 months ago",
+                  videoUrl: "https://youtube.com/watch?v=example2"
+                },
+                {
+                  title: "Expert Take: Should You Invest?",
+                  channelName: "Finance Guru",
+                  timeAgo: "4 months ago",
+                  videoUrl: "https://youtube.com/watch?v=example3"
+                }
+              ]}
+            />
+          </TabsContent>
+        </Tabs>
+      )}
+
+      {selectedFunds.length < 2 && selectedFunds.length > 0 && (
+        <p className="text-center text-muted-foreground">Select at least two funds to see the comparison.</p>
+      )}
     </div>
   );
 };
