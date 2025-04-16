@@ -7,6 +7,7 @@ interface FundOpinion {
   channelName: string;
   timeAgo: string;
   videoUrl: string;
+  thumbnailUrl?: string;
 }
 
 interface FundOpinionsProps {
@@ -18,24 +19,38 @@ export function FundOpinions({ fundName, opinions }: FundOpinionsProps) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle className="flex items-center gap-2">
-          <Youtube className="h-5 w-5 text-red-600" />
-          {fundName} Reviews & Opinions
-        </CardTitle>
+        <CardTitle className="text-xl">{fundName} Review & Opinions</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
+        <div className="space-y-6">
           {opinions.map((opinion, index) => (
             <a
               key={index}
               href={opinion.videoUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-start gap-3 p-3 hover:bg-muted rounded-lg transition-colors"
+              className="flex items-start gap-4 hover:bg-muted/50 rounded-lg transition-colors group"
             >
-              <Youtube className="h-12 w-12 text-red-600 flex-shrink-0" />
+              <div className="relative min-w-[120px] h-[68px] rounded-md overflow-hidden bg-muted">
+                {opinion.thumbnailUrl ? (
+                  <img 
+                    src={opinion.thumbnailUrl} 
+                    alt={opinion.title} 
+                    className="object-cover w-full h-full"
+                  />
+                ) : (
+                  <div className="flex items-center justify-center h-full bg-red-100 dark:bg-red-900/20">
+                    <Youtube className="h-8 w-8 text-red-600" />
+                  </div>
+                )}
+                <div className="absolute inset-0 flex items-center justify-center bg-black/5 group-hover:bg-black/10 transition-colors">
+                  <div className="bg-black/60 rounded-full p-2 opacity-80 group-hover:opacity-100 transition-opacity">
+                    <Youtube className="h-6 w-6 text-white" />
+                  </div>
+                </div>
+              </div>
               <div className="space-y-1">
-                <h3 className="font-medium line-clamp-2">{opinion.title}</h3>
+                <h3 className="font-medium line-clamp-2 group-hover:text-primary transition-colors">{opinion.title}</h3>
                 <p className="text-sm text-muted-foreground">
                   {opinion.channelName} • {opinion.timeAgo}
                 </p>

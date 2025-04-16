@@ -64,6 +64,47 @@ export const CompareFunds: React.FC = () => {
     setSelectedFunds(selectedFunds.filter((fund) => fund.id !== fundToRemove.id));
   };
 
+  // Sample YouTube videos for fund opinions based on first selected fund
+  const getOpinions = (fundName: string) => [
+    {
+      title: `${fundName} vs ICICI Prudential Balanced Advantage Fund 2024 | Which is Better?`,
+      channelName: 'ZFunds',
+      timeAgo: '6 months ago',
+      videoUrl: 'https://youtube.com/watch?v=example1',
+      thumbnailUrl: 'public/lovable-uploads/1d9ea1a6-96c4-4373-9ee9-bfe8d0e48be8.png'
+    },
+    {
+      title: `#FundTalk on Hybrid Funds with Srinivasan Ramamurthy`,
+      channelName: `${fundName.split(' ')[0]} Mutual Fund`,
+      timeAgo: '2 years ago',
+      videoUrl: 'https://youtube.com/watch?v=example2',
+    },
+    {
+      title: `Top 3 ${fundName.split(' ')[0]} Mutual Funds | ${fundName.split(' ')[0]} Mutual Fund | ${fundName.split(' ')[0]} Midcap Fund | ${fundName}`,
+      channelName: 'ZFunds',
+      timeAgo: '3 years ago',
+      videoUrl: 'https://youtube.com/watch?v=example3',
+    },
+    {
+      title: `${fundName} 2020 | Review in Hindi | ${fundName.split(' ')[0]} बैलेंस एडवांटेज फंड`,
+      channelName: 'ZFunds',
+      timeAgo: '4 years ago',
+      videoUrl: 'https://youtube.com/watch?v=example4',
+    },
+    {
+      title: `${fundName.toUpperCase()} REVIEW|${fundName.split(' ')[0]} MUTUAL FUND|BEST ${fundName.split(' ')[0]} MUTUAL FUND TO INVEST|Aliceblue|${fundName.split(' ')[0]}|`,
+      channelName: 'Invest Empires',
+      timeAgo: '4 years ago',
+      videoUrl: 'https://youtube.com/watch?v=example5',
+    },
+    {
+      title: `Mutual Funds SIP Investment vs Lump Sum for Beginners`,
+      channelName: 'Asset Yogi',
+      timeAgo: '5 years ago',
+      videoUrl: 'https://youtube.com/watch?v=example6',
+    }
+  ];
+
   return (
     <div className="container mx-auto p-4 space-y-6">
       <Card>
@@ -93,44 +134,25 @@ export const CompareFunds: React.FC = () => {
       </Card>
 
       {selectedFunds.length >= 2 && (
-        <Tabs defaultValue="comparison" className="space-y-6">
-          <TabsList>
-            <TabsTrigger value="comparison">Comparison</TabsTrigger>
-            <TabsTrigger value="returns">Returns</TabsTrigger>
-            <TabsTrigger value="opinions">Expert Opinions</TabsTrigger>
+        <Tabs defaultValue="returns" className="space-y-6">
+          <TabsList className="w-full sm:w-auto justify-start">
+            <TabsTrigger value="returns" className="flex-1 sm:flex-none">Returns</TabsTrigger>
+            <TabsTrigger value="comparison" className="flex-1 sm:flex-none">Comparison</TabsTrigger>
+            <TabsTrigger value="opinions" className="flex-1 sm:flex-none">Expert Opinions</TabsTrigger>
           </TabsList>
-          
-          <TabsContent value="comparison">
-            <ComparisonTable funds={selectedFunds} />
-          </TabsContent>
           
           <TabsContent value="returns">
             <ComparisonChart funds={selectedFunds} />
           </TabsContent>
           
+          <TabsContent value="comparison">
+            <ComparisonTable funds={selectedFunds} />
+          </TabsContent>
+          
           <TabsContent value="opinions">
             <FundOpinions 
               fundName={selectedFunds[0].scheme_name}
-              opinions={[
-                {
-                  title: "Fund Analysis & Detailed Review 2024",
-                  channelName: "Investment Guide",
-                  timeAgo: "2 months ago",
-                  videoUrl: "https://youtube.com/watch?v=example1"
-                },
-                {
-                  title: "Comparison with Peer Funds",
-                  channelName: "Market Insights",
-                  timeAgo: "3 months ago",
-                  videoUrl: "https://youtube.com/watch?v=example2"
-                },
-                {
-                  title: "Expert Take: Should You Invest?",
-                  channelName: "Finance Guru",
-                  timeAgo: "4 months ago",
-                  videoUrl: "https://youtube.com/watch?v=example3"
-                }
-              ]}
+              opinions={getOpinions(selectedFunds[0].scheme_name)}
             />
           </TabsContent>
         </Tabs>
