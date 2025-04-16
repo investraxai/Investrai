@@ -45,6 +45,15 @@ class Fund(models.Model):
     min_lumpsum = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     exit_load = models.CharField(max_length=255, blank=True, null=True)
     
+    # Advanced metrics
+    standard_deviation = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    sharpe_ratio = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    treynor_ratio = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    beta = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    alpha = models.DecimalField(max_digits=5, decimal_places=2, null=True, blank=True)
+    cagr = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    max_drawdown = models.DecimalField(max_digits=8, decimal_places=2, null=True, blank=True)
+    
     class Meta:
         ordering = ['scheme_name']
         

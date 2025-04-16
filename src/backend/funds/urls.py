@@ -12,4 +12,5 @@ urlpatterns = [
     path('top-funds/', views.get_top_performing_funds, name='top-funds'),
     path('refresh-data/', views.refresh_fund_data, name='refresh-data'),
     path('amcs/', views.get_all_amcs, name='all-amcs'),
+    path('metrics-stats/', views.get_advanced_metrics_stats, name='metrics-stats'),
 ]

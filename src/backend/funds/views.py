@@ -6,6 +6,9 @@ from rest_framework.response import Response
 from django.db.models import Q
 from .models import Fund, DataProvider
 from .serializers import FundSerializer, DataProviderSerializer
+import sys
+import os
+from django.http import JsonResponse
 from datetime import datetime
 
 class FundViewSet(viewsets.ReadOnlyModelViewSet):
@@ -101,6 +104,22 @@ def get_all_amcs(request):
     """Get list of all AMCs"""
     amcs = Fund.objects.values_list('amc', flat=True).distinct().order_by('amc')
     return Response(list(amcs))
+
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def refresh_fund_data(request):
+    """Refresh fund data from external API"""
+    try:
+        # Import locally to avoid circular imports
+        current_dir = os.path.dirname(os.path.abspath(__file__))
+        backend_dir = os.path.dirname(current_dir)
+        sys.path.append(backend_dir)
+        
+        from fund_data_service import main as refresh_data
+        refresh_data()
+        return JsonResponse({"status": "success", "message": "Fund data refreshed successfully"})
+    except Exception as e:
+        return JsonResponse({"status": "error", "message": str(e)}, status=500)
 
 @api_view(['GET'])
 @permission_classes([AllowAny])

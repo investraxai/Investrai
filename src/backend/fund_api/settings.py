@@ -1,3 +1,4 @@
+
 """
 Django settings for fund_api project.
 """

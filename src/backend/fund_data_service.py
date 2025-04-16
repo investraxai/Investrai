@@ -69,7 +69,14 @@ def update_database(funds_data):
                     'fund_manager': fund_data.get('fund_manager'),
                     'min_sip_amount': fund_data.get('min_sip_amount'),
                     'min_lumpsum': fund_data.get('min_lumpsum'),
-                    'exit_load': fund_data.get('exit_load')
+                    'exit_load': fund_data.get('exit_load'),
+                    'standard_deviation': fund_data.get('standard_deviation'),
+                    'sharpe_ratio': fund_data.get('sharpe_ratio'),
+                    'treynor_ratio': fund_data.get('treynor_ratio'),
+                    'beta': fund_data.get('beta'),
+                    'alpha': fund_data.get('alpha'),
+                    'cagr': fund_data.get('cagr'),
+                    'max_drawdown': fund_data.get('max_drawdown')
                 }
             )
             
@@ -148,6 +155,14 @@ def _create_sample_fund_data():
         years_ago = (i % 20) + 1
         inception_date = (datetime.now() - timedelta(days=years_ago*365)).strftime('%Y-%m-%d')
         
+        # Add advanced metrics
+        standard_deviation = round(((i * 1.5) % 15) + 5, 2)  # 5% to 20%
+        sharpe_ratio = round(((i * 0.1) % 1) + 0.2, 2)  # 0.2 to 1.2
+        treynor_ratio = round(((i * 0.05) % 0.8) + 0.1, 2)  # 0.1 to 0.9
+        beta = round(((i * 0.1) % 0.8) + 0.6, 2)  # 0.6 to 1.4
+        alpha = round(((i * 0.5) % 7) - 2, 2)  # -2 to 5
+        max_drawdown = round(((i * 2) % 25) + 10, 2)  # 10% to 35%
+        
         fund = {
             "scheme_name": f"{amc} {sub_category} Fund Series {i}",
             "amc": amc,
@@ -164,6 +179,13 @@ def _create_sample_fund_data():
             "min_sip_amount": (i % 10) * 100 + 500,
             "min_lumpsum": (i % 10) * 1000 + 1000,
             "exit_load": "1% if redeemed within 1 year" if i % 3 == 0 else "Nil",
+            "standard_deviation": standard_deviation,
+            "sharpe_ratio": sharpe_ratio,
+            "treynor_ratio": treynor_ratio,
+            "beta": beta,
+            "alpha": alpha,
+            "cagr": five_y_return,
+            "max_drawdown": max_drawdown,
             "returns": {
                 "1Y": one_y_return,
                 "3Y": three_y_return,

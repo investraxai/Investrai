@@ -38,6 +38,10 @@ This is the Django REST Framework backend for the Mutual Fund Screener applicati
 
 7. Load initial data:
    ```
+   python manage.py populate_funds
+   ```
+   Or fetch data from the service:
+   ```
    python fund_data_service.py
    ```
 
@@ -55,6 +59,7 @@ The API will be available at http://127.0.0.1:8000/api/
 - `GET /api/top-funds/` - Get top performing funds
 - `GET /api/amcs/` - Get list of all AMCs
 - `GET /api/refresh-data/` - Refresh fund data from external API
+- `GET /api/metrics-stats/` - Get statistics for advanced metrics
 
 ## Filtering Examples
 
@@ -62,6 +67,7 @@ The API will be available at http://127.0.0.1:8000/api/
 - Filter by AMC: `/api/funds/?amc=HDFC%20Mutual%20Fund`
 - Minimum 1Y return: `/api/funds/?minReturn1Y=15`
 - Search by name: `/api/funds/?searchQuery=Bluechip`
+- Advanced filters: `/api/funds/?minSharpeRatio=0.8&maxStandardDeviation=15`
 
 ## Admin Interface
 

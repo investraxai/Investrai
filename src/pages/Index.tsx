@@ -1,194 +1,203 @@
+import React, { useState, useEffect } from 'react';
+import { Link } from 'react-router-dom';
+import { FundData } from '@/lib/types';
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { FundCard } from '@/components/fund-card';
+import { ScreenCard } from '@/components/screen-card';
+import { getTopPerformingFunds } from '@/lib/mock-data';
+import { FilterIcon, Search, TrendingUp } from 'lucide-react';
 
-import { useEffect, useState } from "react";
-import { useQuery } from "@tanstack/react-query";
-import { Layout } from "@/components/layout";
-import { FundCard } from "@/components/fund-card";
-import { StatsCard } from "@/components/stats-card";
-import { FundData } from "@/lib/types";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { TrendingUp, LineChart, PieChart, BarChart3 } from "lucide-react";
-import { fetchFunds, fetchTopPerformingFunds } from "@/lib/api";
-import { toast } from "@/components/ui/use-toast";
+const Index = () => {
+  const [funds, setFunds] = useState<FundData[]>([]);
+  const [topFunds, setTopFunds] = useState<FundData[]>([]);
+  const [categoryFilter, setCategoryFilter] = useState<string>('');
+  const [amcFilter, setAmcFilter] = useState<string>('');
+  const [searchQuery, setSearchQuery] = useState<string>('');
+  const [sortOrder, setSortOrder] = useState<'asc' | 'desc'>('desc');
+  const [allAMCs, setAllAMCs] = useState<string[]>([]);
 
-const Home = () => {
-  // Use React Query to fetch data
-  const { data: allFunds, isLoading: isLoadingAllFunds } = useQuery({
-    queryKey: ["funds"],
-    queryFn: async () => {
+  useEffect(() => {
+    // Fetch funds from the Django backend API
+    const fetchFunds = async () => {
       try {
-        return await fetchFunds();
+        let url = '/api/funds/';
+        const params = new URLSearchParams();
+        if (categoryFilter) params.append('category', categoryFilter);
+        if (amcFilter) params.append('amc', amcFilter);
+        if (searchQuery) params.append('searchQuery', searchQuery);
+
+        const queryString = params.toString();
+        if (queryString) url += `?${queryString}`;
+
+        const response = await fetch(url);
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setFunds(data);
       } catch (error) {
-        toast({
-          title: "Error fetching funds",
-          description: error instanceof Error ? error.message : "An unknown error occurred",
-          variant: "destructive",
-        });
-        return [];
+        console.error("Could not fetch funds:", error);
       }
-    },
-  });
-  
-  const { data: topFunds } = useQuery({
-    queryKey: ["topFunds"],
-    queryFn: async () => {
+    };
+
+    fetchFunds();
+  }, [categoryFilter, amcFilter, searchQuery]);
+
+  useEffect(() => {
+    // Fetch top performing funds from the Django backend API
+    const fetchTopFunds = async () => {
       try {
-        return await fetchTopPerformingFunds("1Y", undefined, 6);
+        const response = await fetch('/api/top-funds/');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setTopFunds(data);
       } catch (error) {
-        toast({
-          title: "Error fetching top funds",
-          description: error instanceof Error ? error.message : "An unknown error occurred",
-          variant: "destructive",
-        });
-        return [];
+        console.error("Could not fetch top funds:", error);
       }
-    },
-  });
-  
-  const { data: equityFunds } = useQuery({
-    queryKey: ["categoryFunds", "Equity"],
-    queryFn: async () => {
+    };
+
+    fetchTopFunds();
+  }, []);
+
+  useEffect(() => {
+    // Fetch all AMCs from the Django backend API
+    const fetchAllAMCs = async () => {
       try {
-        return await fetchFunds({ category: "Equity" });
+        const response = await fetch('/api/amcs/');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setAllAMCs(data);
       } catch (error) {
-        return [];
+        console.error("Could not fetch AMCs:", error);
       }
-    },
-    select: data => data.slice(0, 6)
+    };
+
+    fetchAllAMCs();
+  }, []);
+
+  const handleCategoryChange = (category: string) => {
+    setCategoryFilter(category);
+  };
+
+  const handleAmcChange = (amc: string) => {
+    setAmcFilter(amc);
+  };
+
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchQuery(e.target.value);
+  };
+
+  const handleSortOrderChange = () => {
+    setSortOrder(prevOrder => (prevOrder === 'asc' ? 'desc' : 'asc'));
+  };
+
+  const sortedFunds = [...funds].sort((a, b) => {
+    const returnA = a.returns["1Y"] || 0;
+    const returnB = b.returns["1Y"] || 0;
+
+    if (sortOrder === 'asc') {
+      return returnA - returnB;
+    } else {
+      return returnB - returnA;
+    }
   });
-  
-  const { data: debtFunds } = useQuery({
-    queryKey: ["categoryFunds", "Debt"],
-    queryFn: async () => {
-      try {
-        return await fetchFunds({ category: "Debt" });
-      } catch (error) {
-        return [];
-      }
-    },
-    select: data => data.slice(0, 6)
-  });
-  
-  const { data: hybridFunds } = useQuery({
-    queryKey: ["categoryFunds", "Hybrid"],
-    queryFn: async () => {
-      try {
-        return await fetchFunds({ category: "Hybrid" });
-      } catch (error) {
-        return [];
-      }
-    },
-    select: data => data.slice(0, 6)
-  });
-  
-  // Calculate market statistics
-  const totalFunds = allFunds?.length || 0;
-  const avgReturn1Y = allFunds?.reduce((sum, fund) => sum + fund.returns["1Y"], 0) / (totalFunds || 1) || 0;
-  const topGainer = allFunds?.reduce((max, fund) => 
-    fund.returns["1Y"] > max.returns["1Y"] ? fund : max, allFunds[0] || { returns: { "1Y": 0 }, scheme_name: "" }) || { returns: { "1Y": 0 }, scheme_name: "" };
-  const fundCategories = allFunds ? [...new Set(allFunds.map(fund => fund.category))].length : 0;
-  
+
   return (
-    <Layout>
-      <section className="py-6 md:py-10">
-        <div className="container px-4 md:px-6">
-          <div className="flex flex-col items-center justify-center space-y-4 text-center">
-            <div className="space-y-2">
-              <h1 className="text-3xl font-bold tracking-tighter sm:text-4xl md:text-5xl">
-                Explore the Best Mutual Funds in India
-              </h1>
-              <p className="mx-auto max-w-[700px] text-muted-foreground md:text-xl">
-                Research, compare, and track top-performing mutual funds with our powerful screener and analytics tools.
-              </p>
-            </div>
+    <div className="container mx-auto px-4 py-8">
+      <div className="mb-8 flex justify-between items-center">
+        <h1 className="text-2xl font-bold">Mutual Fund Screener</h1>
+        <div className="flex items-center space-x-4">
+          <div className="relative">
+            <input
+              type="search"
+              placeholder="Search funds..."
+              className="px-4 py-2 rounded-md border border-gray-300 focus:outline-none focus:ring-2 focus:ring-blue-500"
+              onChange={handleSearchChange}
+            />
+            <Search className="absolute right-3 top-1/2 transform -translate-y-1/2 text-gray-500" />
           </div>
+          <Button variant="outline" onClick={handleSortOrderChange}>
+            Sort by 1Y Returns <TrendingUp className="ml-2" />
+          </Button>
         </div>
-      </section>
-      
-      <section className="py-8">
-        <div className="container px-4 md:px-6">
-          <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
-            <StatsCard
-              title="Total Funds"
-              value={totalFunds}
-              description="Available for screening"
-              icon={<BarChart3 className="h-4 w-4" />}
+      </div>
+
+      <Tabs defaultValue="funds" className="w-full mb-8">
+        <TabsList>
+          <TabsTrigger value="funds">Funds</TabsTrigger>
+          <TabsTrigger value="top">Top Performing</TabsTrigger>
+          <TabsTrigger value="screens">Screens</TabsTrigger>
+        </TabsList>
+        <TabsContent value="funds" className="space-y-4">
+          <div className="flex space-x-4">
+            <Select onValueChange={handleCategoryChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by Category" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All Categories</SelectItem>
+                <SelectItem value="Equity">Equity</SelectItem>
+                <SelectItem value="Debt">Debt</SelectItem>
+                <SelectItem value="Hybrid">Hybrid</SelectItem>
+                <SelectItem value="Solution Oriented">Solution Oriented</SelectItem>
+                <SelectItem value="Other">Other</SelectItem>
+              </SelectContent>
+            </Select>
+
+            <Select onValueChange={handleAmcChange}>
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Filter by AMC" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="">All AMCs</SelectItem>
+                {allAMCs.map(amc => (
+                  <SelectItem key={amc} value={amc}>{amc}</SelectItem>
+                ))}
+              </SelectContent>
+            </Select>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {sortedFunds.map((fund) => (
+              <FundCard key={fund.id} fund={fund} />
+            ))}
+          </div>
+        </TabsContent>
+        <TabsContent value="top" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {topFunds.map((fund) => (
+              <FundCard key={fund.id} fund={fund} />
+            ))}
+          </div>
+        </TabsContent>
+        <TabsContent value="screens" className="space-y-4">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <ScreenCard
+              title="High Sharpe Ratio Funds"
+              description="Funds with a Sharpe Ratio > 1.0"
+              filter={{ minSharpeRatio: 1.0 }}
             />
-            <StatsCard
-              title="Avg 1Y Return"
-              value={`${avgReturn1Y.toFixed(2)}%`}
-              description="Across all categories"
-              trend={avgReturn1Y}
-              icon={<LineChart className="h-4 w-4" />}
+            <ScreenCard
+              title="Low Expense Ratio Funds"
+              description="Funds with Expense Ratio < 1.0%"
+              filter={{ maxExpenseRatio: 1.0 }}
             />
-            <StatsCard
-              title="Top Gainer"
-              value={`${topGainer.returns["1Y"].toFixed(2)}%`}
-              description={topGainer.scheme_name.substring(0, 20) + "..."}
-              icon={<TrendingUp className="h-4 w-4" />}
-            />
-            <StatsCard
-              title="Fund Categories"
-              value={fundCategories}
-              description="Equity, Debt, Hybrid and more"
-              icon={<PieChart className="h-4 w-4" />}
+            <ScreenCard
+              title="High AUM Funds"
+              description="Funds with AUM > 10,000 Cr"
+              filter={{ minAUM: 10000 }}
             />
           </div>
-        </div>
-      </section>
-      
-      <section className="py-8">
-        <div className="container px-4 md:px-6">
-          {isLoadingAllFunds ? (
-            <div className="text-center py-8">
-              <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-primary border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]"></div>
-              <p className="mt-4 text-muted-foreground">Loading funds...</p>
-            </div>
-          ) : (
-            <Tabs defaultValue="top-funds" className="w-full">
-              <TabsList className="mb-6">
-                <TabsTrigger value="top-funds">Top Funds</TabsTrigger>
-                <TabsTrigger value="equity">Equity</TabsTrigger>
-                <TabsTrigger value="debt">Debt</TabsTrigger>
-                <TabsTrigger value="hybrid">Hybrid</TabsTrigger>
-              </TabsList>
-              
-              <TabsContent value="top-funds">
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {topFunds?.map(fund => (
-                    <FundCard key={fund.id} fund={fund} />
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="equity">
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {equityFunds?.map(fund => (
-                    <FundCard key={fund.id} fund={fund} />
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="debt">
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {debtFunds?.map(fund => (
-                    <FundCard key={fund.id} fund={fund} />
-                  ))}
-                </div>
-              </TabsContent>
-              
-              <TabsContent value="hybrid">
-                <div className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                  {hybridFunds?.map(fund => (
-                    <FundCard key={fund.id} fund={fund} />
-                  ))}
-                </div>
-              </TabsContent>
-            </Tabs>
-          )}
-        </div>
-      </section>
-    </Layout>
+        </TabsContent>
+      </Tabs>
+    </div>
   );
 };
 
-export default Home;
+export default Index;

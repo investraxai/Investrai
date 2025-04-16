@@ -17,7 +17,9 @@ class FundSerializer(serializers.ModelSerializer):
             'category', 'sub_category', 'expense_ratio', 'aum', 
             'aum_category', 'risk_rating', 'inception_date', 
             'fund_manager', 'min_sip_amount', 'min_lumpsum',
-            'exit_load', 'returns'
+            'exit_load', 'returns', 'standard_deviation', 
+            'sharpe_ratio', 'treynor_ratio', 'beta', 'alpha',
+            'cagr', 'max_drawdown'
         ]
     
     def get_returns(self, obj):
